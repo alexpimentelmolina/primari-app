@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze:*)",
+      "Bash(flutter devices:*)",
+      "Bash(lsof -ti:8080)",
+      "Bash(xargs kill:*)",
+      "Bash(flutter run:*)",
+      "Bash(lsof -i:8080)",
+      "Bash(find /Users/alexpimentelmolina/primari_app -type f \\\\\\(-name *.html -o -name *.htm \\\\\\))",
+      "Bash(curl:*)",
+      "Bash(pkill -f 'flutter run')",
+      "Bash(pkill -f dart.*flutter)",
+      "Bash(flutter pub:*)",
+      "Read(//Users/alexpimentelmolina/Desktop/**)",
+      "Bash(python3 -c \":*)",
+      "Bash(flutter --version)",
+      "Bash(flutter build:*)"
+    ]
+  }
+}
