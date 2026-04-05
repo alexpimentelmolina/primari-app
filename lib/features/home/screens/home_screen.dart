@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +29,7 @@ class HomeScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isWeb = constraints.maxWidth > 900;
+          final isWebMobile = kIsWeb && constraints.maxWidth < 600;
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +37,9 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 80), // espacio para el appbar transparente
                 if (isWeb) const _WebHeroSection(),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: isWeb ? 80 : 24),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isWeb ? 80 : (isWebMobile ? 16 : 24),
+                  ),
                   child: Column(
                     crossAxisAlignment: isWeb ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                     children: [
@@ -293,6 +297,8 @@ class _CategoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWebMobile = kIsWeb && MediaQuery.of(context).size.width < 600;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -306,17 +312,36 @@ class _CategoriesSection extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         SizedBox(
-          height: 112,
+          height: isWebMobile ? 124 : 112,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
+            // Clip.none para que el ítem parcialmente visible en el borde
+            // no quede cortado de forma abrupta en web móvil
+            clipBehavior: isWebMobile ? Clip.none : Clip.hardEdge,
+            // Padding de fin para que el último ítem pueda scrollar hasta verse completo
+            padding: isWebMobile
+                ? const EdgeInsets.only(right: 16)
+                : EdgeInsets.zero,
             itemCount: _categories.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
+            separatorBuilder: (context, index) => SizedBox(
+              width: isWebMobile ? 20 : 16,
+            ),
             itemBuilder: (context, index) {
               final (icon, label, bg, fg, catKey) = _categories[index];
               final svgAsset = label == 'Frutas' ? 'assets/icons/frutas.svg' : label == 'Verduras' ? 'assets/icons/verduras.svg' : label == 'Carne' ? 'assets/icons/carne.svg' : null;
               final applyColorFilter = label != 'Verduras' && label != 'Carne';
               final svgSize = label == 'Verduras' ? 35.0 : label == 'Carne' ? 33.0 : 31.0;
-              return _CategoryCircle(icon: icon, label: label, bgColor: bg, iconColor: fg, categoryKey: catKey, svgAsset: svgAsset, applyColorFilter: applyColorFilter, svgSize: svgSize);
+              return _CategoryCircle(
+                icon: icon,
+                label: label,
+                bgColor: bg,
+                iconColor: fg,
+                categoryKey: catKey,
+                svgAsset: svgAsset,
+                applyColorFilter: applyColorFilter,
+                svgSize: svgSize,
+                circleSize: isWebMobile ? 88.0 : 80.0,
+              );
             },
           ),
         ),
@@ -334,6 +359,7 @@ class _CategoryCircle extends StatelessWidget {
   final String? svgAsset;
   final bool applyColorFilter;
   final double svgSize;
+  final double circleSize;
   const _CategoryCircle({
     required this.icon,
     required this.label,
@@ -343,6 +369,7 @@ class _CategoryCircle extends StatelessWidget {
     this.svgAsset,
     this.svgSize = 31,
     this.applyColorFilter = true,
+    this.circleSize = 80,
   });
 
   @override
@@ -350,12 +377,12 @@ class _CategoryCircle extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.go('/buscar?cat=${Uri.encodeComponent(categoryKey)}'),
       child: SizedBox(
-        width: 80,
+        width: circleSize,
         child: Column(
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: circleSize,
+              height: circleSize,
               alignment: Alignment.center,
               decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
               child: svgAsset != null

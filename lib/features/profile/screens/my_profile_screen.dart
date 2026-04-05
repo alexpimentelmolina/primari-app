@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -356,11 +357,17 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWebMobile = kIsWeb && MediaQuery.of(context).size.width < 600;
+    final cardPadding = isWebMobile ? 14.0 : 24.0;
+    final iconSize = isWebMobile ? 40.0 : 48.0;
+    final gap = isWebMobile ? 12.0 : 20.0;
+    final titleFontSize = isWebMobile ? 14.0 : 16.0;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(cardPadding),
         decoration: BoxDecoration(
           color: AppTheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(12),
@@ -368,23 +375,25 @@ class _NavItem extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: iconSize,
+              height: iconSize,
               decoration: BoxDecoration(
                 color: circleColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: AppTheme.primary, size: 22),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: gap),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.notoSerif(
-                      fontSize: 16,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.onSurface,
                     ),
@@ -399,7 +408,6 @@ class _NavItem extends StatelessWidget {
                 ],
               ),
             ),
-            const Spacer(),
             Icon(Icons.chevron_right, color: AppTheme.outline, size: 22),
           ],
         ),
@@ -415,11 +423,16 @@ class _LogoutNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWebMobile = kIsWeb && MediaQuery.of(context).size.width < 600;
+    final cardPadding = isWebMobile ? 14.0 : 24.0;
+    final gap = isWebMobile ? 12.0 : 20.0;
+    final titleFontSize = isWebMobile ? 14.0 : 16.0;
+
     return InkWell(
       onTap: onLogout,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(cardPadding),
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
@@ -428,15 +441,17 @@ class _LogoutNavItem extends StatelessWidget {
         child: Row(
           children: [
             Icon(Icons.logout, color: AppTheme.error, size: 22),
-            const SizedBox(width: 20),
+            SizedBox(width: gap),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Cerrar sesión',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: GoogleFonts.notoSerif(
-                      fontSize: 16,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.onSurface,
                     ),
