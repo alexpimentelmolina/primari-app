@@ -22,7 +22,7 @@ class FavoritesScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppTheme.background,
       extendBodyBehindAppBar: true,
-      appBar: _FavoritesAppBar(),
+      appBar: const _FavoritesAppBar(),
       body: user == null
           ? _NotLoggedIn()
           : productsAsync.when(
@@ -49,6 +49,8 @@ class FavoritesScreen extends ConsumerWidget {
 // ── AppBar ────────────────────────────────────────────────────────────────────
 
 class _FavoritesAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _FavoritesAppBar();
+
   @override
   Size get preferredSize => const Size.fromHeight(72);
 
@@ -220,12 +222,12 @@ class _FavoritesList extends StatelessWidget {
 
 // ── Tarjeta de producto en favoritos ─────────────────────────────────────────
 
-class _FavoriteCard extends ConsumerWidget {
+class _FavoriteCard extends StatelessWidget {
   final Product product;
   const _FavoriteCard({required this.product});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push('/producto/${product.id}'),
       child: ClipRRect(
@@ -243,6 +245,8 @@ class _FavoriteCard extends ConsumerWidget {
                         ? Image.network(
                             product.coverImageUrl!,
                             fit: BoxFit.cover,
+                            cacheWidth: 340,
+                            cacheHeight: 340,
                             errorBuilder: (ctx, err, st) => Container(
                               color: AppTheme.surfaceContainerHigh,
                               child: const Icon(Icons.image_outlined,

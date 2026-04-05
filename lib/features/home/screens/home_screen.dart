@@ -478,17 +478,17 @@ class _WideBentoGrid extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(flex: 2, child: _HeroProductCard(product: products[0])),
+              Expanded(flex: 2, child: RepaintBoundary(child: _HeroProductCard(product: products[0]))),
               if (products.length > 1) ...[
                 const SizedBox(width: 24),
-                Expanded(flex: 1, child: _SmallProductCard(product: products[1])),
+                Expanded(flex: 1, child: RepaintBoundary(child: _SmallProductCard(product: products[1]))),
               ],
             ],
           ),
         ),
         if (products.length > 2) ...[
           const SizedBox(height: 24),
-          SizedBox(height: 200, child: _HorizontalProductCard(product: products[2])),
+          SizedBox(height: 200, child: RepaintBoundary(child: _HorizontalProductCard(product: products[2]))),
         ],
       ],
     );
@@ -503,14 +503,14 @@ class _NarrowBentoGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 360, child: _HeroProductCard(product: products[0])),
+        SizedBox(height: 360, child: RepaintBoundary(child: _HeroProductCard(product: products[0]))),
         if (products.length > 1) ...[
           const SizedBox(height: 24),
-          SizedBox(height: 400, child: _SmallProductCard(product: products[1])),
+          SizedBox(height: 400, child: RepaintBoundary(child: _SmallProductCard(product: products[1]))),
         ],
         if (products.length > 2) ...[
           const SizedBox(height: 24),
-          SizedBox(height: 220, child: _HorizontalProductCard(product: products[2])),
+          SizedBox(height: 220, child: RepaintBoundary(child: _HorizontalProductCard(product: products[2]))),
         ],
       ],
     );
@@ -524,7 +524,9 @@ class _HeroProductCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
-    final isFav = ref.watch(favoriteIdsProvider).valueOrNull?.contains(product.id) ?? false;
+    final isFav = ref.watch(
+      favoriteIdsProvider.select((v) => v.valueOrNull?.contains(product.id) ?? false),
+    );
 
     return GestureDetector(
       onTap: () => context.push('/producto/${product.id}'),
@@ -535,6 +537,7 @@ class _HeroProductCard extends ConsumerWidget {
           children: [
             product.coverImageUrl != null
                 ? Image.network(product.coverImageUrl!, fit: BoxFit.cover,
+                    cacheWidth: 800,
                     errorBuilder: (ctx, err, st) => Container(color: AppTheme.surfaceContainerLow))
                 : Container(color: AppTheme.surfaceContainerLow,
                     child: const Icon(Icons.image_outlined, size: 48, color: AppTheme.onSurfaceVariant)),
@@ -619,7 +622,9 @@ class _SmallProductCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
-    final isFav = ref.watch(favoriteIdsProvider).valueOrNull?.contains(product.id) ?? false;
+    final isFav = ref.watch(
+      favoriteIdsProvider.select((v) => v.valueOrNull?.contains(product.id) ?? false),
+    );
 
     return GestureDetector(
       onTap: () => context.push('/producto/${product.id}'),
@@ -632,6 +637,7 @@ class _SmallProductCard extends ConsumerWidget {
               Expanded(
                 child: product.coverImageUrl != null
                     ? Image.network(product.coverImageUrl!, fit: BoxFit.cover, width: double.infinity,
+                        cacheWidth: 400,
                         errorBuilder: (ctx, err, st) => Container(color: AppTheme.surfaceContainerLow,
                             child: const Icon(Icons.image_outlined, size: 40, color: AppTheme.onSurfaceVariant)))
                     : Container(color: AppTheme.surfaceContainerLow,
@@ -702,6 +708,7 @@ class _HorizontalProductCard extends StatelessWidget {
                 flex: 1,
                 child: product.coverImageUrl != null
                     ? Image.network(product.coverImageUrl!, fit: BoxFit.cover, height: double.infinity,
+                        cacheWidth: 400,
                         errorBuilder: (ctx, err, st) => Container(color: AppTheme.surfaceContainerHigh,
                             child: const Icon(Icons.image_outlined, size: 40, color: AppTheme.onSurfaceVariant)))
                     : Container(color: AppTheme.surfaceContainerHigh,

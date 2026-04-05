@@ -344,6 +344,8 @@ class _ProductCard extends StatelessWidget {
                         product.coverImageUrl!,
                         fit: BoxFit.cover,
                         width: double.infinity,
+                        cacheWidth: 340,
+                        cacheHeight: 340,
                         errorBuilder: (ctx, err, st) => Container(
                           color: AppTheme.surfaceContainerHigh,
                           child: const Icon(Icons.image_outlined,

@@ -97,49 +97,55 @@ class _ReviewsBody extends ConsumerWidget {
     final summaryAsync = ref.watch(sellerRatingSummaryProvider(sellerId));
     final reviewsAsync = ref.watch(sellerReviewsProvider(sellerId));
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          summaryAsync.when(
-            loading: () => const SizedBox.shrink(),
-            error: (e, st) => const SizedBox.shrink(),
-            data: (summary) {
-              final (avg, count) = summary;
-              if (count == 0) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text(
-                    'Sin valoraciones todavía.',
-                    style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        color: AppTheme.onSurfaceVariant),
-                  ),
-                );
-              }
-              return _RatingSummaryRow(avg: avg, count: count);
-            },
+    final reviews = reviewsAsync.valueOrNull;
+
+    return CustomScrollView(
+      slivers: [
+        // Resumen de rating
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            child: summaryAsync.when(
+              loading: () => const SizedBox.shrink(),
+              error: (e, st) => const SizedBox.shrink(),
+              data: (s) {
+                final (avg, count) = s;
+                if (count == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text(
+                      'Sin valoraciones todavía.',
+                      style: GoogleFonts.manrope(
+                          fontSize: 14, color: AppTheme.onSurfaceVariant),
+                    ),
+                  );
+                }
+                return _RatingSummaryRow(avg: avg, count: count);
+              },
+            ),
           ),
-          const SizedBox(height: 24),
-          reviewsAsync.when(
-            loading: () => const Center(
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        // Lista de reviews con builder (lazy)
+        if (reviewsAsync.isLoading)
+          const SliverToBoxAdapter(
+            child: Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
                 child: CircularProgressIndicator(
                     color: AppTheme.primary, strokeWidth: 2),
               ),
             ),
-            error: (e, st) => const SizedBox.shrink(),
-            data: (reviews) {
-              if (reviews.isEmpty) return const SizedBox.shrink();
-              return Column(
-                children: reviews.map((r) => _ReviewCard(review: r)).toList(),
-              );
-            },
+          )
+        else if (reviews != null && reviews.isNotEmpty)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+            sliver: SliverList.builder(
+              itemCount: reviews.length,
+              itemBuilder: (ctx, i) => _ReviewCard(review: reviews[i]),
+            ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
