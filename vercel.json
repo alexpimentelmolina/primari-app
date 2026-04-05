@@ -2,6 +2,7 @@
   "github": {
     "enabled": false
   },
+  "framework": null,
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]

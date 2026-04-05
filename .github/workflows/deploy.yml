@@ -24,12 +24,11 @@ jobs:
       - name: Build web
         run: flutter build web --release
 
-      - name: Copy vercel.json and project config to output
-        run: |
-          cp vercel.json build/web/vercel.json
-          mkdir -p build/web/.vercel
-          cp .vercel/project.json build/web/.vercel/project.json
+      - name: Copy vercel.json to output
+        run: cp vercel.json build/web/vercel.json
 
       - name: Deploy to Vercel
-        working-directory: build/web
-        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        run: cd build/web && npx vercel@latest --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        env:
+          VERCEL_ORG_ID: team_Z2I2SJMZypubeHhgEs4uyMAh
+          VERCEL_PROJECT_ID: prj_WRbG0iqaw1YKwH8SxtKW2JhWeFdz
