@@ -201,21 +201,27 @@ class _FavoritesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: EdgeInsets.only(
-        top: 96,
-        left: 16,
-        right: 16,
-        bottom: MediaQuery.of(context).padding.bottom + 16,
-      ),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        mainAxisExtent: 240,
-      ),
-      itemCount: products.length,
-      itemBuilder: (ctx, i) => _FavoriteCard(product: products[i]),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        final columns = w >= 1100 ? 5 : w >= 800 ? 4 : w >= 550 ? 3 : 2;
+        return GridView.builder(
+          padding: EdgeInsets.only(
+            top: 96,
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).padding.bottom + 16,
+          ),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            mainAxisExtent: 240,
+          ),
+          itemCount: products.length,
+          itemBuilder: (ctx, i) => _FavoriteCard(product: products[i]),
+        );
+      },
     );
   }
 }
@@ -245,8 +251,7 @@ class _FavoriteCard extends StatelessWidget {
                         ? Image.network(
                             product.coverImageUrl!,
                             fit: BoxFit.cover,
-                            cacheWidth: 340,
-                            cacheHeight: 340,
+                            cacheWidth: 400,
                             errorBuilder: (ctx, err, st) => Container(
                               color: AppTheme.surfaceContainerHigh,
                               child: const Icon(Icons.image_outlined,

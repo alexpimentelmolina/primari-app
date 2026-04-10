@@ -182,8 +182,11 @@ class _ImageGallery extends StatelessWidget {
               : PageView.builder(
                   itemCount: imageUrls.length,
                   onPageChanged: onPageChanged,
-                  itemBuilder: (ctx, i) => Image.network(imageUrls[i], fit: BoxFit.cover,
-                      errorBuilder: (ctx, err, st) => Container(color: AppTheme.surfaceContainerHigh, child: const Icon(Icons.image_not_supported_outlined, size: 48, color: AppTheme.onSurfaceVariant))),
+                  itemBuilder: (ctx, i) => GestureDetector(
+                    onTap: () => _openFullscreen(ctx, imageUrls, i),
+                    child: Image.network(imageUrls[i], fit: BoxFit.cover,
+                        errorBuilder: (ctx, err, st) => Container(color: AppTheme.surfaceContainerHigh, child: const Icon(Icons.image_not_supported_outlined, size: 48, color: AppTheme.onSurfaceVariant))),
+                  ),
                 ),
           Positioned(
             top: 96,
@@ -638,6 +641,118 @@ class _ReportSheetState extends State<_ReportSheet> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─── Visor de imágenes a pantalla completa ────────────────────────────────────
+
+void _openFullscreen(BuildContext context, List<String> imageUrls, int initialIndex) {
+  Navigator.of(context).push(
+    PageRouteBuilder(
+      opaque: true,
+      barrierColor: Colors.black,
+      pageBuilder: (ctx, animation, secondaryAnimation) => _FullscreenGallery(
+        imageUrls: imageUrls,
+        initialIndex: initialIndex,
+      ),
+      transitionsBuilder: (ctx, animation, secondaryAnimation, child) =>
+          FadeTransition(opacity: animation, child: child),
+    ),
+  );
+}
+
+class _FullscreenGallery extends StatefulWidget {
+  final List<String> imageUrls;
+  final int initialIndex;
+  const _FullscreenGallery({required this.imageUrls, required this.initialIndex});
+
+  @override
+  State<_FullscreenGallery> createState() => _FullscreenGalleryState();
+}
+
+class _FullscreenGalleryState extends State<_FullscreenGallery> {
+  late final PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.close, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: widget.imageUrls.length > 1
+            ? Text(
+                '${_currentIndex + 1} / ${widget.imageUrls.length}',
+                style: GoogleFonts.manrope(color: Colors.white70, fontSize: 14),
+              )
+            : null,
+      ),
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.imageUrls.length,
+            onPageChanged: (i) => setState(() => _currentIndex = i),
+            itemBuilder: (ctx, i) => InteractiveViewer(
+              minScale: 1.0,
+              maxScale: 4.0,
+              child: Center(
+                child: Image.network(
+                  widget.imageUrls[i],
+                  fit: BoxFit.contain,
+                  errorBuilder: (ctx, err, st) => const Icon(
+                    Icons.image_not_supported_outlined,
+                    color: Colors.white30,
+                    size: 64,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (widget.imageUrls.length > 1)
+            Positioned(
+              bottom: MediaQuery.of(context).padding.bottom + 24,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  widget.imageUrls.length,
+                  (i) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: i == _currentIndex ? 20 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: i == _currentIndex ? Colors.white : Colors.white38,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
