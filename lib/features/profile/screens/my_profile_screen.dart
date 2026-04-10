@@ -659,9 +659,10 @@ class _StatsBento extends ConsumerWidget {
       ],
     );
     if (isWebDesktop) {
-      return Center(
+      return Align(
+        alignment: Alignment.centerLeft,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
+          constraints: const BoxConstraints(maxWidth: 560),
           child: statsRow,
         ),
       );
