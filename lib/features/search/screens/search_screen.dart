@@ -775,7 +775,6 @@ class _SearchResultCard extends StatelessWidget {
                         product.coverImageUrl!,
                         fit: BoxFit.cover,
                         cacheWidth: 200,
-                        cacheHeight: 200,
                         errorBuilder: (ctx, err, st) => Container(
                           color: AppTheme.surfaceContainerHigh,
                           child: const Icon(Icons.image_outlined,
