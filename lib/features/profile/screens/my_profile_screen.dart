@@ -562,7 +562,8 @@ class _StatsBento extends ConsumerWidget {
     final ratingLabel = count == 0 ? '—' : avg.toStringAsFixed(1);
     final activeCount = activeAsync.valueOrNull?.length ?? 0;
 
-    return Row(
+    final isWebDesktop = kIsWeb && MediaQuery.of(context).size.width > 600;
+    final statsRow = Row(
       children: [
         Expanded(
           child: AspectRatio(
@@ -657,5 +658,14 @@ class _StatsBento extends ConsumerWidget {
         ),
       ],
     );
+    if (isWebDesktop) {
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: statsRow,
+        ),
+      );
+    }
+    return statsRow;
   }
 }
