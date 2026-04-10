@@ -17,6 +17,7 @@ import '../../features/profile/screens/edit_profile_screen.dart';
 import '../../features/reviews/screens/seller_reviews_screen.dart';
 import '../../features/legal/screens/terms_screen.dart';
 import '../../features/legal/screens/privacy_screen.dart';
+import '../../features/legal/screens/aviso_legal_screen.dart';
 import 'router_notifier.dart';
 
 // El router como Provider de Riverpod para acceder a ref
@@ -108,6 +109,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/privacidad',
         builder: (context, state) => const PrivacyScreen(),
+      ),
+      GoRoute(
+        path: '/aviso-legal',
+        builder: (context, state) => const AvisoLegalScreen(),
       ),
       GoRoute(
         path: '/buscar',

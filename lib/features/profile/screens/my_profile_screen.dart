@@ -306,9 +306,57 @@ class _NavigationGrid extends StatelessWidget {
 
   const _NavigationGrid({required this.onLogout});
 
+  void _showContactDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surfaceContainerLow,
+        title: Text(
+          'Contacto',
+          style: GoogleFonts.notoSerif(
+            fontWeight: FontWeight.w600,
+            color: AppTheme.onSurface,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Para cualquier consulta, escríbenos a:',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: AppTheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            SelectableText(
+              'info@weareprimari.com',
+              style: GoogleFonts.manrope(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.primary,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Cerrar',
+              style: GoogleFonts.manrope(color: AppTheme.primary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _NavItem(
           circleColor: AppTheme.primaryContainer,
@@ -332,6 +380,34 @@ class _NavigationGrid extends StatelessWidget {
           title: 'Configuración',
           subtitle: 'Cuenta y notificaciones',
           onTap: () => context.push('/configuracion'),
+        ),
+        const SizedBox(height: 24),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'AYUDA',
+            style: GoogleFonts.manrope(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: AppTheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        _NavItem(
+          circleColor: AppTheme.surfaceVariant,
+          icon: Icons.mail_outline,
+          title: 'Contacto',
+          subtitle: 'info@weareprimari.com',
+          onTap: () => _showContactDialog(context),
+        ),
+        const SizedBox(height: 12),
+        _NavItem(
+          circleColor: AppTheme.surfaceVariant,
+          icon: Icons.description_outlined,
+          title: 'Aviso legal',
+          subtitle: 'Términos y privacidad',
+          onTap: () => context.push('/aviso-legal'),
         ),
         const SizedBox(height: 12),
         _LogoutNavItem(onLogout: onLogout),
