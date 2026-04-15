@@ -64,6 +64,9 @@ dependencies:
   sign_in_with_apple: ^6.1.0
   crypto: ^3.0.3
 
+  # Persistencia local (consentimiento de cookies en web → localStorage)
+  shared_preferences: ^2.5.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

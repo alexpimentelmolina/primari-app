@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -5,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/supabase_config.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'shared/widgets/cookie_banner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +30,20 @@ class PrimariApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
       routerConfig: router,
+      builder: (context, child) {
+        if (!kIsWeb) return child!;
+        return Stack(
+          children: [
+            child!,
+            const Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: CookieBannerOverlay(),
+            ),
+          ],
+        );
+      },
     );
   }
 }

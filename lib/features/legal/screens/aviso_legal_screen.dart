@@ -1,6 +1,9 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/providers/cookie_consent_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
 class AvisoLegalScreen extends StatelessWidget {
@@ -42,6 +45,18 @@ class AvisoLegalScreen extends StatelessWidget {
               title: 'Política de privacidad',
               onTap: () => context.push('/privacidad'),
             ),
+            if (kIsWeb) ...[
+              const SizedBox(height: 12),
+              Consumer(
+                builder: (context, ref, _) => _LegalItem(
+                  icon: Icons.cookie_outlined,
+                  title: 'Gestionar cookies',
+                  onTap: () async {
+                    await ref.read(cookieConsentProvider.notifier).reset();
+                  },
+                ),
+              ),
+            ],
           ],
         ),
       ),
