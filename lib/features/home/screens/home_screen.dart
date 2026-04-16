@@ -896,44 +896,53 @@ class _WebHeroSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 40),
       child: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Text(
-              'we',
-              style: GoogleFonts.notoSerif(
-                fontSize: 72,
-                fontWeight: FontWeight.w400,
-                fontStyle: FontStyle.italic,
-                color: _kWe,
-                letterSpacing: -1.5,
-              ),
+        // Semantics expone un H1 al árbol de accesibilidad y a los rastreadores
+        // web. ExcludeSemantics evita que los textos hijos generen entradas
+        // individuales redundantes. El diseño visual no cambia.
+        child: Semantics(
+          header: true,
+          label: 'Prímari — Marketplace del sector primario. Compra y vende sin intermediarios.',
+          child: ExcludeSemantics(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  'we',
+                  style: GoogleFonts.notoSerif(
+                    fontSize: 72,
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FontStyle.italic,
+                    color: _kWe,
+                    letterSpacing: -1.5,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Text(
+                  'are',
+                  style: GoogleFonts.notoSerif(
+                    fontSize: 72,
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FontStyle.italic,
+                    color: _kAre,
+                    letterSpacing: -1.5,
+                  ),
+                ),
+                const SizedBox(width: 18),
+                Text(
+                  'Prímari',
+                  style: GoogleFonts.notoSerif(
+                    fontSize: 72,
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FontStyle.normal,
+                    color: _kPrimari,
+                    letterSpacing: -1.5,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 14),
-            Text(
-              'are',
-              style: GoogleFonts.notoSerif(
-                fontSize: 72,
-                fontWeight: FontWeight.w400,
-                fontStyle: FontStyle.italic,
-                color: _kAre,
-                letterSpacing: -1.5,
-              ),
-            ),
-            const SizedBox(width: 18),
-            Text(
-              'Prímari',
-              style: GoogleFonts.notoSerif(
-                fontSize: 72,
-                fontWeight: FontWeight.w400,
-                fontStyle: FontStyle.normal,
-                color: _kPrimari,
-                letterSpacing: -1.5,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

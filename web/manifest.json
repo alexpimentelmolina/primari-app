@@ -4,8 +4,9 @@
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F9F7EB",
-    "theme_color": "#628474",
-    "description": "Prímari — Marketplace del sector primario",
+    "theme_color": "#154212",
+    "description": "Compra y vende productos del sector primario sin intermediarios. Conecta con productores locales y descubre venta directa en toda España.",
+    "lang": "es",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

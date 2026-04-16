@@ -1,46 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    base href is replaced at build time by flutter build --base-href.
+    Do not remove this placeholder.
   -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Prímari — Marketplace del sector primario">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- iOS meta tags & icons -->
+  <!-- ── SEO primario ───────────────────────────────────────────────────────── -->
+  <title>Prímari | Compra y venta sin intermediarios del sector primario</title>
+  <meta name="description" content="Prímari es la plataforma para comprar y vender productos del sector primario sin intermediarios. Descubre productores locales, alimentos de proximidad y venta directa en toda España.">
+  <meta name="keywords" content="sector primario, marketplace sector primario, comprar sin intermediarios, vender sin intermediarios, productores locales, venta directa, alimentos de proximidad, productos del campo, Prímari, weareprimari">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Prímari">
+  <link rel="canonical" href="https://weareprimari.com/">
+
+  <!-- ── Open Graph (redes sociales + Google) ───────────────────────────────── -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://weareprimari.com/">
+  <meta property="og:site_name" content="Prímari">
+  <meta property="og:title" content="Prímari | Compra y venta sin intermediarios del sector primario">
+  <meta property="og:description" content="Prímari es la plataforma para comprar y vender productos del sector primario sin intermediarios. Descubre productores locales, alimentos de proximidad y venta directa en toda España.">
+  <meta property="og:image" content="https://weareprimari.com/icons/Icon-512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="Prímari — Marketplace del sector primario">
+  <meta property="og:locale" content="es_ES">
+
+  <!-- ── Twitter Card ───────────────────────────────────────────────────────── -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Prímari | Compra y venta sin intermediarios del sector primario">
+  <meta name="twitter:description" content="Prímari es la plataforma para comprar y vender productos del sector primario sin intermediarios. Descubre productores locales y venta directa en toda España.">
+  <meta name="twitter:image" content="https://weareprimari.com/icons/Icon-512.png">
+  <meta name="twitter:image:alt" content="Prímari">
+
+  <!-- ── Datos estructurados JSON-LD ───────────────────────────────────────── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://weareprimari.com/#organization",
+        "name": "Prímari",
+        "alternateName": "weareprimari",
+        "url": "https://weareprimari.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://weareprimari.com/icons/Icon-512.png",
+          "width": 512,
+          "height": 512
+        },
+        "description": "Marketplace del sector primario para comprar y vender sin intermediarios. Conecta con productores locales y descubre venta directa en toda España.",
+        "sameAs": []
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://weareprimari.com/#website",
+        "url": "https://weareprimari.com/",
+        "name": "Prímari",
+        "description": "Plataforma para comprar y vender productos del sector primario sin intermediarios. Productores locales, alimentos de proximidad y venta directa.",
+        "inLanguage": "es-ES",
+        "publisher": { "@id": "https://weareprimari.com/#organization" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://weareprimari.com/buscar?q={search_term_string}"
+          },
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- ── PWA / iOS ──────────────────────────────────────────────────────────── -->
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Prímari">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- ── Favicon ────────────────────────────────────────────────────────────── -->
+  <link rel="icon" type="image/png" href="favicon.png">
 
-  <title>Prímari</title>
+  <!-- ── Manifest PWA ──────────────────────────────────────────────────────── -->
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
+    Contenido semántico visible para rastreadores antes de que Flutter cargue.
+    Este bloque representa fielmente lo que muestra la página (no es cloaking).
+    Flutter lo cubre con su canvas al inicializar.
   -->
+  <div id="primari-pre-render" style="position:absolute;top:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+    <h1>Prímari — Marketplace del sector primario</h1>
+    <p>Compra y vende productos del sector primario sin intermediarios. Conecta directamente con productores locales, descubre alimentos de proximidad y accede a venta directa en toda España.</p>
+    <nav>
+      <a href="/buscar">Buscar productos</a>
+      <a href="/publicar">Publicar producto</a>
+      <a href="/terminos">Términos y condiciones</a>
+      <a href="/privacidad">Política de privacidad</a>
+    </nav>
+  </div>
+
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Bloquear rutas privadas o de autenticación que no aportan valor SEO
+Disallow: /completar-perfil
+Disallow: /configuracion
+Disallow: /publicar
+Disallow: /mis-productos
+Disallow: /listados-activos
+Disallow: /editar-producto/
+Disallow: /favoritos
+Disallow: /mi-perfil
+
+Sitemap: https://weareprimari.com/sitemap.xml
