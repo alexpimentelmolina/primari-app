@@ -35,12 +35,7 @@ class PrimariApp extends ConsumerWidget {
         return Stack(
           children: [
             child!,
-            const Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: CookieBannerOverlay(),
-            ),
+            const CookieBannerOverlay(),
           ],
         );
       },
