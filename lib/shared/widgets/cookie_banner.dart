@@ -9,12 +9,30 @@ import '../../core/theme/app_theme.dart';
 // ─── Overlay que se coloca encima del árbol de rutas ─────────────────────────
 // Usado en main.dart dentro del builder de MaterialApp.router
 
-class CookieBannerOverlay extends ConsumerWidget {
+class CookieBannerOverlay extends ConsumerStatefulWidget {
   const CookieBannerOverlay({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    if (!kIsWeb) return const SizedBox.shrink();
+  ConsumerState<CookieBannerOverlay> createState() =>
+      _CookieBannerOverlayState();
+}
+
+class _CookieBannerOverlayState extends ConsumerState<CookieBannerOverlay> {
+  // The splash screen lasts ~1800 ms. We wait 2100 ms before allowing the
+  // banner to render so it never overlaps visually with the splash animation.
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 2100), () {
+      if (mounted) setState(() => _ready = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!kIsWeb || !_ready) return const SizedBox.shrink();
 
     final consentAsync = ref.watch(cookieConsentProvider);
     return consentAsync.when(
@@ -162,8 +180,7 @@ class _BannerText extends StatelessWidget {
                 style: GoogleFonts.manrope(
                   fontSize: 13,
                   color: AppTheme.primary,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppTheme.primary,
+                  fontWeight: FontWeight.w600,
                   height: 1.5,
                 ),
               ),
@@ -231,7 +248,7 @@ class _ConfigureBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () => _showConfigSheet(context, notifier),
+      onPressed: () => _showConfigDialog(context, notifier),
       style: TextButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -248,58 +265,44 @@ class _ConfigureBtn extends StatelessWidget {
   }
 }
 
-// ─── Sheet de configuración por categorías ────────────────────────────────────
+// ─── Diálogo de configuración por categorías ─────────────────────────────────
+// showDialog uses the root navigator and renders above the banner Stack.
 
-void _showConfigSheet(BuildContext context, CookieConsentNotifier notifier) {
-  showModalBottomSheet(
+void _showConfigDialog(BuildContext context, CookieConsentNotifier notifier) {
+  showDialog<void>(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => _CookieConfigSheet(notifier: notifier),
+    barrierDismissible: true,
+    builder: (_) => _CookieConfigDialog(notifier: notifier),
   );
 }
 
-class _CookieConfigSheet extends StatefulWidget {
+class _CookieConfigDialog extends StatefulWidget {
   final CookieConsentNotifier notifier;
-  const _CookieConfigSheet({required this.notifier});
+  const _CookieConfigDialog({required this.notifier});
 
   @override
-  State<_CookieConfigSheet> createState() => _CookieConfigSheetState();
+  State<_CookieConfigDialog> createState() => _CookieConfigDialogState();
 }
 
-class _CookieConfigSheetState extends State<_CookieConfigSheet> {
+class _CookieConfigDialogState extends State<_CookieConfigDialog> {
   bool _analytics = false;
   bool _preferences = false;
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.72,
-      maxChildSize: 0.92,
-      minChildSize: 0.45,
-      builder: (_, sc) => Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surfaceContainerLowest,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
+    return Dialog(
+      backgroundColor: AppTheme.surfaceContainerLowest,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppTheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                controller: sc,
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 16, 0),
+              child: Row(
                 children: [
                   Text(
                     'Configurar cookies',
@@ -309,79 +312,124 @@ class _CookieConfigSheetState extends State<_CookieConfigSheet> {
                       color: AppTheme.onSurface,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Elige qué tipos de cookies permites. Puedes cambiar tu elección en cualquier momento desde Aviso legal.',
-                    style: GoogleFonts.manrope(
-                      fontSize: 13,
-                      color: AppTheme.onSurfaceVariant,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  // Necesarias (always on, locked)
-                  _CookieCategory(
-                    title: 'Cookies necesarias',
-                    description:
-                        'Imprescindibles para el funcionamiento de la plataforma: autenticación, sesión y seguridad. No pueden desactivarse.',
-                    value: true,
-                    locked: true,
-                    onChanged: null,
-                  ),
-                  const Divider(height: 28, color: AppTheme.outlineVariant),
-
-                  // Análisis (optional)
-                  _CookieCategory(
-                    title: 'Cookies de análisis',
-                    description:
-                        'Nos ayudan a entender cómo se usa la plataforma para mejorarla. Actualmente no empleamos cookies de análisis de terceros.',
-                    value: _analytics,
-                    locked: false,
-                    onChanged: (v) => setState(() => _analytics = v),
-                  ),
-                  const Divider(height: 28, color: AppTheme.outlineVariant),
-
-                  // Preferencias (optional)
-                  _CookieCategory(
-                    title: 'Cookies de preferencias',
-                    description:
-                        'Guardan ajustes personales como filtros de búsqueda o configuraciones de visualización.',
-                    value: _preferences,
-                    locked: false,
-                    onChanged: (v) => setState(() => _preferences = v),
-                  ),
-
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.notifier.saveCustom();
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      'Guardar preferencias',
-                      style: GoogleFonts.manrope(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () {
-                      widget.notifier.accept();
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'Aceptar todas',
-                      style: GoogleFonts.manrope(color: AppTheme.primary),
-                    ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    color: AppTheme.onSurfaceVariant,
+                    onPressed: () => Navigator.of(context).pop(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
+              ),
+            ),
+            // Scrollable body
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Elige qué tipos de cookies permites. Puedes cambiar tu elección en cualquier momento desde Aviso legal.',
+                      style: GoogleFonts.manrope(
+                        fontSize: 13,
+                        color: AppTheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    // Necesarias (always on, locked)
+                    _CookieCategory(
+                      title: 'Cookies necesarias',
+                      description:
+                          'Imprescindibles para el funcionamiento de la plataforma: autenticación, sesión y seguridad. No pueden desactivarse.',
+                      value: true,
+                      locked: true,
+                      onChanged: null,
+                    ),
+                    const Divider(height: 28, color: AppTheme.outlineVariant),
+                    // Análisis (optional)
+                    _CookieCategory(
+                      title: 'Cookies de análisis',
+                      description:
+                          'Nos ayudan a entender cómo se usa la plataforma para mejorarla. Actualmente no empleamos cookies de análisis de terceros.',
+                      value: _analytics,
+                      locked: false,
+                      onChanged: (v) => setState(() => _analytics = v),
+                    ),
+                    const Divider(height: 28, color: AppTheme.outlineVariant),
+                    // Preferencias (optional)
+                    _CookieCategory(
+                      title: 'Cookies de preferencias',
+                      description:
+                          'Guardan ajustes personales como filtros de búsqueda o configuraciones de visualización.',
+                      value: _preferences,
+                      locked: false,
+                      onChanged: (v) => setState(() => _preferences = v),
+                    ),
+                    const SizedBox(height: 28),
+                    // ── Botones de acción ──────────────────────────────────
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          widget.notifier.saveCustom();
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: const StadiumBorder(),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Guardar preferencias',
+                          style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          widget.notifier.reject();
+                          Navigator.of(context).pop();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.onSurface,
+                          side: const BorderSide(
+                              color: AppTheme.outlineVariant),
+                          shape: const StadiumBorder(),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        child: Text(
+                          'Rechazar no esenciales',
+                          style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      child: TextButton(
+                        onPressed: () {
+                          widget.notifier.accept();
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Aceptar todas',
+                          style: GoogleFonts.manrope(
+                              color: AppTheme.primary),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
