@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Primari App</string>
+	<string>Prímari</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>primari_app</string>
+	<string>Prímari</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -53,6 +53,14 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Prímari usa tu ubicación para mostrarte productos cercanos y calcular distancias hasta los vendedores.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Prímari necesita acceso a tu galería para que puedas añadir fotos a tus productos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Prímari necesita acceso a tu cámara para que puedas hacer fotos de tus productos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Prímari puede guardar imágenes en tu galería.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

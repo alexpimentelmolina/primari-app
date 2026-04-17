@@ -1,0 +1,82 @@
+workflows:
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # iOS · TestFlight
+  # Activa en push a main. Sube automáticamente a TestFlight.
+  # ─────────────────────────────────────────────────────────────────────────────
+  ios-testflight:
+    name: iOS → TestFlight
+    max_build_duration: 60          # minutos; cancela si supera el límite
+    instance_type: mac_mini_m2      # máquina macOS con Xcode incluido
+
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+      # ── Variables de entorno ──────────────────────────────────────────────
+      # Define estas variables en:
+      # Codemagic Dashboard → tu app → Environment variables
+      # Marca cada una como "Secret" si contiene datos sensibles.
+      vars:
+        BUNDLE_ID: com.weareprimari.primari        # ← cambia si es diferente
+        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
+        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
+
+      # ── Signing automático vía App Store Connect API ──────────────────────
+      ios_signing:
+        distribution_type: app_store   # 'app_store' para TestFlight/App Store
+        bundle_identifier: $BUNDLE_ID
+
+    # ── Solo se ejecuta en push a main ─────────────────────────────────────
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+
+    scripts:
+      # 1. Dependencias Flutter
+      - name: Flutter pub get
+        script: flutter pub get
+
+      # 2. Análisis de código (no bloquea el build, solo informa)
+      - name: Flutter analyze
+        script: flutter analyze --no-fatal-infos || true
+
+      # 3. CocoaPods
+      - name: Pod install
+        script: |
+          cd ios
+          pod install --repo-update
+
+      # 4. Build IPA (release, firmado automáticamente)
+      - name: Flutter build IPA
+        script: |
+          flutter build ipa \
+            --release \
+            --export-options-plist=ios/ExportOptions.plist
+
+    # ── Artefactos generados ────────────────────────────────────────────────
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log      # logs de Xcode para depuración
+
+    # ── Publicación automática en TestFlight ────────────────────────────────
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        # submit_to_app_store: false    # descomenta cuando quieras publicar en App Store
+
+      # Notificación por email al terminar el build
+      email:
+        recipients:
+          - alex@weareprimari.com       # ← tu email
+        notify:
+          success: true
+          failure: true
