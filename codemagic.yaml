@@ -19,7 +19,7 @@ workflows:
       # Codemagic Dashboard → tu app → Environment variables
       # Marca cada una como "Secret" si contiene datos sensibles.
       vars:
-        BUNDLE_ID: com.weareprimari.primari        # ← cambia si es diferente
+        BUNDLE_ID: com.primari.primariApp
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
         APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
