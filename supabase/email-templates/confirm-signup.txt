@@ -1,0 +1,26 @@
+Confirma tu cuenta en Prímari
+══════════════════════════════
+
+Hola,
+
+Gracias por unirte a Prímari, el marketplace del sector primario
+para comprar y vender sin intermediarios.
+
+Solo falta un paso: confirma tu dirección de correo electrónico
+para activar tu cuenta.
+
+Confirmar mi cuenta:
+{{ .ConfirmationURL }}
+
+Si el enlace no abre directamente, cópialo y pégalo en tu navegador.
+
+Este enlace de confirmación es de un solo uso y tiene una
+validez limitada. Si no solicitaste esta cuenta, puedes
+ignorar este correo con total seguridad.
+
+──────────────────────────────
+Prímari · Marketplace del sector primario
+weareprimari.com
+
+Política de privacidad: https://weareprimari.com/privacidad
+Términos y condiciones:  https://weareprimari.com/terminos
