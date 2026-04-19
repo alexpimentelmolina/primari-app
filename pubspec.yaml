@@ -67,6 +67,9 @@ dependencies:
   # Persistencia local (consentimiento de cookies en web → localStorage)
   shared_preferences: ^2.5.0
 
+  # Compartir contenido (URL de producto) en iOS, Android y Web
+  share_plus: ^10.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

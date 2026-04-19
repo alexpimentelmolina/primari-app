@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/auth_provider.dart';
@@ -61,7 +62,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         return Scaffold(
           backgroundColor: AppTheme.background,
           extendBodyBehindAppBar: true,
-          appBar: _DetailAppBar(title: product.title),
+          appBar: _DetailAppBar(title: product.title, productId: product.id),
           body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,7 +129,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
 class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  const _DetailAppBar({required this.title});
+  final String productId;
+  const _DetailAppBar({required this.title, required this.productId});
 
   @override
   Size get preferredSize => const Size.fromHeight(72);
@@ -149,7 +151,19 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     IconButton(icon: const Icon(Icons.arrow_back_ios_new), color: AppTheme.primary, onPressed: () => context.canPop() ? context.pop() : context.go('/home')),
                     Expanded(child: Text(title, style: GoogleFonts.notoSerif(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.onSurface), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                    IconButton(icon: const Icon(Icons.share_outlined), color: AppTheme.primary, onPressed: () {}),
+                    IconButton(
+                      icon: const Icon(Icons.share_outlined),
+                      color: AppTheme.primary,
+                      onPressed: () {
+                        const base = 'https://weareprimari.com/producto';
+                        SharePlus.instance.share(
+                          ShareParams(
+                            text: '$title\n$base/$productId',
+                            subject: title,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

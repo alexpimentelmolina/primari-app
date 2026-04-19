@@ -3,7 +3,9 @@
     "enabled": false
   },
   "framework": null,
+  "outputDirectory": "build/web",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/producto/:id", "destination": "/api/og/:id" },
+    { "source": "/(.*)",         "destination": "/index.html"  }
   ]
 }
