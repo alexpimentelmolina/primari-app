@@ -6,30 +6,30 @@ workflows:
   # ─────────────────────────────────────────────────────────────────────────────
   ios-testflight:
     name: iOS → TestFlight
-    max_build_duration: 60          # minutos; cancela si supera el límite
-    instance_type: mac_mini_m2      # máquina macOS con Xcode incluido
+    max_build_duration: 60
+    instance_type: mac_mini_m2
 
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
 
+      # ── Signing ──────────────────────────────────────────────────────────
+      # Codemagic carga el certificado "Primari Distribution" y el perfil
+      # "primari_appstore_profile_new" desde Code Signing → iOS.
+      # xcode-project use-profiles inyecta esas credenciales en el proyecto.
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.primari.primariApp
+
       # ── Variables de entorno ──────────────────────────────────────────────
-      # Define estas variables en:
-      # Codemagic Dashboard → tu app → Environment variables
-      # Marca cada una como "Secret" si contiene datos sensibles.
+      # Define APP_STORE_CONNECT_* en:
+      # Codemagic Dashboard → tu app → Environment variables (marcadas Secret)
       vars:
-        BUNDLE_ID: com.primari.primariApp
         APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
         APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
         APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
 
-      # ── Signing automático vía App Store Connect API ──────────────────────
-      ios_signing:
-        distribution_type: app_store   # 'app_store' para TestFlight/App Store
-        bundle_identifier: $BUNDLE_ID
-
-    # ── Solo se ejecuta en push a main ─────────────────────────────────────
     triggering:
       events:
         - push
@@ -42,7 +42,7 @@ workflows:
       - name: Flutter pub get
         script: flutter pub get
 
-      # 2. Análisis de código (no bloquea el build, solo informa)
+      # 2. Análisis estático (no bloquea el build)
       - name: Flutter analyze
         script: flutter analyze --no-fatal-infos || true
 
@@ -52,31 +52,33 @@ workflows:
           cd ios
           pod install --repo-update
 
-      # 4. Build IPA (release, firmado automáticamente)
+      # 4. Inyectar certificado y perfil en el proyecto Xcode
+      #    Genera /Users/builder/export_options.plist con la configuración
+      #    correcta de firma para la exportación IPA.
+      - name: Set up code signing
+        script: xcode-project use-profiles
+
+      # 5. Build IPA firmada
       - name: Flutter build IPA
         script: |
           flutter build ipa \
             --release \
-            --export-options-plist=ios/ExportOptions.plist
+            --export-options-plist=/Users/builder/export_options.plist
 
-    # ── Artefactos generados ────────────────────────────────────────────────
     artifacts:
       - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log      # logs de Xcode para depuración
+      - /tmp/xcodebuild_logs/*.log
 
-    # ── Publicación automática en TestFlight ────────────────────────────────
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
-        # submit_to_app_store: false    # descomenta cuando quieras publicar en App Store
 
-      # Notificación por email al terminar el build
       email:
         recipients:
-          - alex@weareprimari.com       # ← tu email
+          - alex@weareprimari.com
         notify:
           success: true
           failure: true
