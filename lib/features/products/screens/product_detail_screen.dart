@@ -156,11 +156,9 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
                       color: AppTheme.primary,
                       onPressed: () {
                         const base = 'https://weareprimari.com/producto';
-                        SharePlus.instance.share(
-                          ShareParams(
-                            text: '$title\n$base/$productId',
-                            subject: title,
-                          ),
+                        Share.share(
+                          '$title\n$base/$productId',
+                          subject: title,
                         );
                       },
                     ),
