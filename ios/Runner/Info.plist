@@ -55,6 +55,8 @@
 	<string>Main</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Prímari usa tu ubicación para mostrarte productos cercanos y calcular distancias hasta los vendedores.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Prímari usa tu ubicación para mostrarte productos cercanos y calcular distancias hasta los vendedores.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Prímari necesita acceso a tu galería para que puedas añadir fotos a tus productos.</string>
 	<key>NSCameraUsageDescription</key>
