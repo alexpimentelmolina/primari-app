@@ -9,6 +9,10 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m2
 
+    # ── Integración con App Store Connect vía Team Settings ─────────────────
+    integrations:
+      app_store_connect: Codemagic
+
     environment:
       flutter: stable
       xcode: latest
@@ -21,14 +25,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.primari.primariApp
-
-      # ── Variables de entorno ──────────────────────────────────────────────
-      # Define APP_STORE_CONNECT_* en:
-      # Codemagic Dashboard → tu app → Environment variables (marcadas Secret)
-      vars:
-        APP_STORE_CONNECT_ISSUER_ID: $APP_STORE_CONNECT_ISSUER_ID
-        APP_STORE_CONNECT_KEY_IDENTIFIER: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        APP_STORE_CONNECT_PRIVATE_KEY: $APP_STORE_CONNECT_PRIVATE_KEY
 
     triggering:
       events:
@@ -71,9 +67,7 @@ workflows:
 
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        auth: integration
         submit_to_testflight: true
 
       email:
