@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config/supabase_config.dart';
 import 'core/router/app_router.dart';
+import 'core/services/deep_link_service.dart';
 import 'core/theme/app_theme.dart';
 import 'shared/widgets/cookie_banner.dart';
 
@@ -19,12 +20,26 @@ Future<void> main() async {
   runApp(const ProviderScope(child: PrimariApp()));
 }
 
-class PrimariApp extends ConsumerWidget {
+class PrimariApp extends ConsumerStatefulWidget {
   const PrimariApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PrimariApp> createState() => _PrimariAppState();
+}
+
+class _PrimariAppState extends ConsumerState<PrimariApp> {
+  bool _deepLinksInitialized = false;
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
+
+    // Inicializar deep links una sola vez, cuando el router ya existe
+    if (!_deepLinksInitialized) {
+      _deepLinksInitialized = true;
+      initDeepLinks(ref, router);
+    }
+
     return MaterialApp.router(
       title: 'Prímari',
       debugShowCheckedModeBanner: false,
@@ -42,3 +57,4 @@ class PrimariApp extends ConsumerWidget {
     );
   }
 }
+

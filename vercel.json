@@ -3,9 +3,25 @@
     "enabled": false
   },
   "framework": null,
+  "buildCommand": "",
   "outputDirectory": "build/web",
   "rewrites": [
-    { "source": "/producto/:id", "destination": "/api/og/:id" },
-    { "source": "/(.*)",         "destination": "/index.html"  }
+    { "source": "/producto/:id",       "destination": "/api/og/:id" },
+    { "source": "/.well-known/:file+", "destination": "/.well-known/:file+" },
+    { "source": "/(.*)",               "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
+      "source": "/.well-known/assetlinks.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" }
+      ]
+    }
   ]
 }

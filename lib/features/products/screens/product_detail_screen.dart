@@ -1,10 +1,12 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../shared/utils/share_with_image.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../models/product.dart';
@@ -62,7 +64,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         return Scaffold(
           backgroundColor: AppTheme.background,
           extendBodyBehindAppBar: true,
-          appBar: _DetailAppBar(title: product.title, productId: product.id),
+          appBar: _DetailAppBar(
+            title: product.title,
+            productId: product.id,
+            coverImageUrl: allImageUrls.isNotEmpty ? allImageUrls.first : null,
+          ),
           body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,10 +136,30 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String productId;
-  const _DetailAppBar({required this.title, required this.productId});
+  final String? coverImageUrl;
+  const _DetailAppBar({required this.title, required this.productId, this.coverImageUrl});
 
   @override
   Size get preferredSize => const Size.fromHeight(72);
+
+  Future<void> _shareProduct() async {
+    const base = 'https://weareprimari.com/producto';
+    final url = '$base/$productId';
+    final text = '$title\n$url';
+
+    // En web: solo texto + URL
+    if (kIsWeb) {
+      Share.share(text, subject: title);
+      return;
+    }
+
+    // En móvil: intentar compartir con imagen, fallback a solo texto
+    await shareWithImage(
+      text: text,
+      subject: title,
+      imageUrl: coverImageUrl,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -154,13 +180,7 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
                     IconButton(
                       icon: const Icon(Icons.share_outlined),
                       color: AppTheme.primary,
-                      onPressed: () {
-                        const base = 'https://weareprimari.com/producto';
-                        Share.share(
-                          '$title\n$base/$productId',
-                          subject: title,
-                        );
-                      },
+                      onPressed: _shareProduct,
                     ),
                   ],
                 ),

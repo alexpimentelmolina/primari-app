@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/providers/deep_link_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _weAnim;
@@ -53,7 +55,11 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _goHome() async {
     // Animación termina ~880 ms + hold ~920 ms = 1800 ms total
     await Future.delayed(const Duration(milliseconds: 1800));
-    if (mounted) context.go('/home');
+    if (!mounted) return;
+    // Si llegó un deep link mientras la splash estaba en pantalla,
+    // no pisamos el destino.
+    if (ref.read(pendingDeepLinkProvider) != null) return;
+    context.go('/home');
   }
 
   @override

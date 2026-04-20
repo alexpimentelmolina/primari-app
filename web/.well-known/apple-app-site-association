@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "M55ABZ348N.com.primari.primariApp",
+        "paths": ["/producto/*", "/vendedor/*"]
+      }
+    ]
+  }
+}

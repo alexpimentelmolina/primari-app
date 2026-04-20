@@ -6,22 +6,21 @@
 //   → Devuelve HTML con Open Graph tags del producto específico.
 //
 // Para usuarios normales (navegador):
-//   → Devuelve el mismo HTML, que además carga la app Flutter a través de
-//     flutter_bootstrap.js. GoRouter lee la URL y muestra el producto.
+//   → Devuelve el index.html de Flutter para que la SPA cargue
+//     y GoRouter muestre el producto.
 //
 // La URL canónica del producto es:
 //   https://weareprimari.com/producto/<id>
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SUPABASE_URL = 'https://kpqpylsbaopgssxpjrdq.supabase.co';
-// La anon key es pública (está embebida en la app Flutter).
-// Puedes sobrescribirla con la variable de entorno SUPABASE_ANON_KEY en Vercel.
-const SUPABASE_ANON_KEY =
-  process.env.SUPABASE_ANON_KEY ||
-  'sb_publishable__CpInjR0mmnlsVph8Ukg4w_BZDKxvLJ';
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 const BASE_URL = 'https://weareprimari.com';
 const FALLBACK_IMAGE = `${BASE_URL}/icons/Icon-512.png`;
+
+// Regex tolerante para bots de redes sociales y crawlers
+const BOT_UA_REGEX = /facebookexternalhit|WhatsApp|Twitterbot|Telegrambot|LinkedInBot|Slackbot|Discordbot|Applebot|Pinterestbot|Googlebot|Bingbot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|ia_archiver|MJ12bot|AhrefsBot|SemrushBot/i;
 
 module.exports = async function handler(req, res) {
   const { id } = req.query;
@@ -31,9 +30,23 @@ module.exports = async function handler(req, res) {
     return serveApp(res);
   }
 
+  const ua = req.headers['user-agent'] || '';
+  const isBot = BOT_UA_REGEX.test(ua);
+
+  // Si no es bot y no tenemos service role key, servir la app directamente
+  if (!isBot) {
+    return serveApp(res);
+  }
+
+  // Si no hay key configurada, servir OG genérico
+  if (!SUPABASE_KEY) {
+    console.warn('[og] SUPABASE_SERVICE_ROLE_KEY not set — serving generic OG');
+    return serveApp(res);
+  }
+
   const headers = {
-    apikey: SUPABASE_ANON_KEY,
-    Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    apikey: SUPABASE_KEY,
+    Authorization: `Bearer ${SUPABASE_KEY}`,
   };
 
   try {
@@ -60,7 +73,7 @@ module.exports = async function handler(req, res) {
 
     const product = products[0];
 
-    // Producto no encontrado o inactivo: servir la app genérica
+    // Producto no encontrado o inactivo: servir OG genérico
     if (!product) return serveApp(res);
 
     const imageUrl =
@@ -75,17 +88,15 @@ module.exports = async function handler(req, res) {
       ? rawDesc.slice(0, 197) + '…'
       : rawDesc || `${product.title} en ${product.city}. Compra y vende sin intermediarios en Prímari.`;
 
-    const html = buildHtml({
+    const html = buildOgHtml({
       title: ogTitle,
       description: ogDescription,
       imageUrl,
       productUrl,
-      productId: id,
     });
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    // Cache 5 min en CDN, stale-while-revalidate 10 min
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600');
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
     return res.status(200).send(html);
   } catch (err) {
     console.error('[og] Error fetching product:', err);
@@ -93,10 +104,10 @@ module.exports = async function handler(req, res) {
   }
 };
 
-// Sirve la app Flutter sin OG tags de producto (fallback)
+// Sirve el index.html de Flutter (SPA fallback para usuarios normales)
 function serveApp(res) {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  return res.status(200).send(buildHtml(null));
+  return res.status(200).send(buildAppHtml());
 }
 
 function escapeHtml(str) {
@@ -107,50 +118,71 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-function buildHtml(product) {
-  const title = product
-    ? escapeHtml(product.title)
-    : 'Prímari | Compra y venta sin intermediarios del sector primario';
-  const description = product
-    ? escapeHtml(product.description)
-    : 'Prímari es la plataforma para comprar y vender productos del sector primario sin intermediarios. Descubre productores locales y venta directa en toda España.';
-  const imageUrl = product ? escapeHtml(product.imageUrl) : FALLBACK_IMAGE;
-  const canonicalUrl = product
-    ? escapeHtml(product.productUrl)
-    : BASE_URL + '/';
-  const ogType = product ? 'product' : 'website';
+// HTML con OG tags reales del producto (para bots)
+function buildOgHtml({ title, description, imageUrl, productUrl }) {
+  const t = escapeHtml(title);
+  const d = escapeHtml(description);
+  const img = escapeHtml(imageUrl);
+  const url = escapeHtml(productUrl);
 
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
-  <!--
-    Generado por /api/og/[id].js (Vercel Serverless Function)
-    Sirve metadatos Open Graph dinámicos por producto.
-    El bloque <script> carga la app Flutter para usuarios normales.
-  -->
+  <meta charset="UTF-8">
+  <title>${t}</title>
+  <link rel="canonical" href="${url}">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="product">
+  <meta property="og:url" content="${url}">
+  <meta property="og:site_name" content="Prímari">
+  <meta property="og:title" content="${t}">
+  <meta property="og:description" content="${d}">
+  <meta property="og:image" content="${img}">
+  <meta property="og:image:alt" content="${t}">
+  <meta property="og:locale" content="es_ES">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${t}">
+  <meta name="twitter:description" content="${d}">
+  <meta name="twitter:image" content="${img}">
+</head>
+<body>
+  <h1>${t}</h1>
+  <p>${d}</p>
+  <img src="${img}" alt="${t}">
+  <a href="${url}">Ver en Prímari</a>
+</body>
+</html>`;
+}
+
+// HTML que carga la app Flutter (para usuarios normales)
+function buildAppHtml() {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
   <base href="/">
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>${title}</title>
-  <link rel="canonical" href="${canonicalUrl}">
+  <title>Prímari | Compra y venta sin intermediarios del sector primario</title>
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="${ogType}">
-  <meta property="og:url" content="${canonicalUrl}">
+  <!-- Open Graph genérico -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${BASE_URL}/">
   <meta property="og:site_name" content="Prímari">
-  <meta property="og:title" content="${title}">
-  <meta property="og:description" content="${description}">
-  <meta property="og:image" content="${imageUrl}">
-  <meta property="og:image:alt" content="${title}">
+  <meta property="og:title" content="Prímari | Compra y venta sin intermediarios del sector primario">
+  <meta property="og:description" content="Prímari es la plataforma para comprar y vender productos del sector primario sin intermediarios. Descubre productores locales y venta directa en toda España.">
+  <meta property="og:image" content="${FALLBACK_IMAGE}">
   <meta property="og:locale" content="es_ES">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="${title}">
-  <meta name="twitter:description" content="${description}">
-  <meta name="twitter:image" content="${imageUrl}">
+  <meta name="twitter:title" content="Prímari | Compra y venta sin intermediarios del sector primario">
+  <meta name="twitter:description" content="Prímari es la plataforma para comprar y vender productos del sector primario sin intermediarios.">
+  <meta name="twitter:image" content="${FALLBACK_IMAGE}">
 
   <!-- PWA / iOS -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -162,12 +194,6 @@ function buildHtml(product) {
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!--
-    flutter_bootstrap.js inicializa la app Flutter.
-    Los bots no ejecutan JavaScript, por lo que solo leen los meta tags.
-    Los usuarios obtienen la app Flutter completa con GoRouter
-    leyendo la URL /producto/:id y mostrando el producto.
-  -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>`;
