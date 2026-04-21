@@ -29,6 +29,15 @@ jobs:
       - name: Build web
         run: flutter build web --release
 
+      # Copia el output de Flutter a public/ (directorio no ignorado por .gitignore).
+      # Necesario porque /build/ sí está en .gitignore y vercel deploy --prod
+      # respeta .gitignore al empaquetar archivos para el upload.
+      # Con outputDirectory:"public" en vercel.json, Vercel sirve desde aquí.
+      - name: Copy build to public/
+        run: |
+          rm -rf public
+          cp -r build/web/. public/
+
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 

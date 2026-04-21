@@ -4,7 +4,7 @@
   },
   "framework": null,
   "buildCommand": "",
-  "outputDirectory": "build/web",
+  "outputDirectory": "public",
   "rewrites": [
     { "source": "/producto/:id",       "destination": "/api/og/:id" },
     { "source": "/.well-known/:file+", "destination": "/.well-known/:file+" },

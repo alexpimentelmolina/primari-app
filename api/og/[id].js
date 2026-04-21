@@ -2,10 +2,10 @@
 // Vercel Serverless Function: /api/og/:id
 // Se ejecuta cuando un bot o usuario accede a /producto/:id
 //
-// Para bots (WhatsApp, Telegram, Twitter, Facebook, Google):
+// Para crawlers reales (Googlebot, Twitterbot, facebookexternalhit, etc.):
 //   → Devuelve HTML con Open Graph tags del producto específico.
 //
-// Para usuarios normales (navegador):
+// Para usuarios reales (navegador, in-app browsers):
 //   → Devuelve el index.html de Flutter para que la SPA cargue
 //     y GoRouter muestre el producto.
 //
@@ -19,8 +19,25 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const BASE_URL = 'https://weareprimari.com';
 const FALLBACK_IMAGE = `${BASE_URL}/icons/Icon-512.png`;
 
-// Regex tolerante para bots de redes sociales y crawlers
-const BOT_UA_REGEX = /facebookexternalhit|WhatsApp|Twitterbot|Telegrambot|LinkedInBot|Slackbot|Discordbot|Applebot|Pinterestbot|Googlebot|Bingbot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|ia_archiver|MJ12bot|AhrefsBot|SemrushBot/i;
+// Crawlers puros de redes sociales y motores de búsqueda.
+// NOTA: NO incluye "WhatsApp" aquí — ver lógica separada abajo.
+// Estos UAs son de bots dedicados que NO llevan prefijo "Mozilla/5.0".
+const CRAWLER_UA_REGEX = /facebookexternalhit|Twitterbot|Telegrambot|LinkedInBot|Slackbot|Discordbot|Applebot|Pinterestbot|Googlebot|Bingbot|bingbot|Slurp|DuckDuckBot|Baiduspider|YandexBot|Sogou|Exabot|ia_archiver|MJ12bot|AhrefsBot|SemrushBot/i;
+
+// Devuelve true solo para el fetcher de preview de WhatsApp (backend),
+// que tiene UA tipo "WhatsApp/2.x A" sin prefijo de navegador.
+// El in-app browser de WhatsApp lleva "Mozilla/5.0" + "WhatsApp/24.x":
+// ese es un usuario real que debe recibir la app Flutter, no OG HTML.
+function isWhatsAppFetcher(ua) {
+  return /WhatsApp\/[\d.]/.test(ua) && !/Mozilla\//i.test(ua);
+}
+
+// Determina si la petición viene de un crawler/bot que necesita OG tags.
+// Regla: UA vacío → tratar como usuario (safe default → Flutter app).
+function isBotRequest(ua) {
+  if (!ua) return false;
+  return CRAWLER_UA_REGEX.test(ua) || isWhatsAppFetcher(ua);
+}
 
 module.exports = async function handler(req, res) {
   const { id } = req.query;
@@ -31,7 +48,7 @@ module.exports = async function handler(req, res) {
   }
 
   const ua = req.headers['user-agent'] || '';
-  const isBot = BOT_UA_REGEX.test(ua);
+  const isBot = isBotRequest(ua);
 
   // Si no es bot y no tenemos service role key, servir la app directamente
   if (!isBot) {
