@@ -18,7 +18,8 @@ export const config = {
 };
 
 const SUPABASE_URL = 'https://kpqpylsbaopgssxpjrdq.supabase.co';
-const BASE_URL     = 'https://weareprimari.com';
+const BASE_URL     = 'https://www.weareprimari.com';
+const IMG_PROXY    = `${BASE_URL}/api/og-img`;
 const FALLBACK_IMAGE = `${BASE_URL}/icons/Icon-512.png`;
 
 const CRAWLER_UA_REGEX =
@@ -123,9 +124,12 @@ export default async function middleware(request) {
 
     const galleryUrl   = Array.isArray(images) ? images[0]?.image_url : null;
     const candidateUrl = product.cover_image_url || galleryUrl;
+    // Supabase Storage añade "x-robots-tag: none" en todas sus respuestas.
+    // WhatsApp/Telegram respetan ese header y no renderizan la imagen.
+    // Solución: re-servir a través de nuestro proxy /api/og-img que omite ese header.
     const imageUrl     =
       candidateUrl && candidateUrl.startsWith('http')
-        ? candidateUrl
+        ? `${IMG_PROXY}?u=${encodeURIComponent(candidateUrl)}`
         : FALLBACK_IMAGE;
 
     const productUrl = `${BASE_URL}/producto/${id}`;
