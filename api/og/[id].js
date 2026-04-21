@@ -88,15 +88,25 @@ module.exports = async function handler(req, res) {
       imagesRes.json(),
     ]);
 
-    const product = products[0];
+    // Supabase puede devolver un objeto de error en vez de un array si la
+    // key es inválida o la tabla no existe. Comprobamos explícitamente.
+    const product = Array.isArray(products) ? products[0] : null;
 
     // Producto no encontrado o inactivo: servir OG genérico
-    if (!product) return serveApp(res);
+    if (!product) {
+      console.warn('[og] product not found or query error:', products);
+      return serveApp(res);
+    }
 
-    const imageUrl =
-      product.cover_image_url ||
-      images[0]?.image_url ||
-      FALLBACK_IMAGE;
+    // Primera imagen disponible: portada del producto → primera de galería → fallback
+    const galleryUrl = Array.isArray(images) ? images[0]?.image_url : null;
+    const candidateUrl = product.cover_image_url || galleryUrl;
+    // Validamos que sea una URL absoluta pública (empieza por http)
+    const imageUrl = (candidateUrl && candidateUrl.startsWith('http'))
+      ? candidateUrl
+      : FALLBACK_IMAGE;
+
+    console.log(`[og] id=${id} cover=${product.cover_image_url} gallery=${galleryUrl} → ${imageUrl}`);
 
     const productUrl = `${BASE_URL}/producto/${id}`;
     const ogTitle = `${product.title} — Prímari`;
@@ -113,7 +123,7 @@ module.exports = async function handler(req, res) {
     });
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=3600');
     return res.status(200).send(html);
   } catch (err) {
     console.error('[og] Error fetching product:', err);

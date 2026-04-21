@@ -1,5 +1,6 @@
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
+import 'package:flutter/widgets.dart' show WidgetsBinding;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/deep_link_provider.dart';
@@ -9,9 +10,25 @@ import '../providers/deep_link_provider.dart';
 /// - Cold start: `getInitialLink()` captura el link que abrió la app.
 /// - Warm: `uriLinkStream` captura links que llegan con la app abierta.
 ///
-/// En web no hacemos nada: GoRouter lee la URL del navegador directamente.
+/// En web, GoRouter lee window.location.pathname directamente con
+/// PathUrlStrategy. Pero si GoRouter pasa brevemente por initialLocation:'/'
+/// antes de leer la URL de plataforma, el splash timer (_goHome, 1800 ms)
+/// podría pisar el destino correcto con context.go('/home'). Prevenimos
+/// esto marcando la URL inicial como pendiente — el guard del splash lo
+/// comprobará antes de navegar a /home.
 void initDeepLinks(WidgetRef ref, GoRouter router) {
-  if (kIsWeb) return;
+  if (kIsWeb) {
+    final rawName =
+        WidgetsBinding.instance.platformDispatcher.defaultRouteName;
+    // defaultRouteName puede venir como ruta absoluta ('/producto/UUID')
+    // o como URL completa ('https://weareprimari.com/producto/UUID').
+    final path = Uri.tryParse(rawName)?.path ?? rawName;
+    if (path.isNotEmpty && path != '/') {
+      debugPrint('[deep_link] web initial: $path');
+      ref.read(pendingDeepLinkProvider.notifier).state = path;
+    }
+    return;
+  }
 
   final appLinks = AppLinks();
 
