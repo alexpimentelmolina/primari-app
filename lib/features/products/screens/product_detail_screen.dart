@@ -143,7 +143,7 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(72);
 
   Future<void> _shareProduct() async {
-    const base = 'https://weareprimari.com/producto';
+    const base = 'https://www.weareprimari.com/producto';
     final url = '$base/$productId';
     final text = '$title\n$url';
 
