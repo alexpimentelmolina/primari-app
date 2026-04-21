@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -330,7 +331,7 @@ class _ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/producto/${product.id}'),
+      onTap: () => kIsWeb ? context.go('/producto/${product.id}') : context.push('/producto/${product.id}'),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Container(

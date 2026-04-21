@@ -556,7 +556,7 @@ class _HeroProductCard extends ConsumerWidget {
     );
 
     return GestureDetector(
-      onTap: () => context.push('/producto/${product.id}'),
+      onTap: () => kIsWeb ? context.go('/producto/${product.id}') : context.push('/producto/${product.id}'),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: Stack(
@@ -654,7 +654,7 @@ class _SmallProductCard extends ConsumerWidget {
     );
 
     return GestureDetector(
-      onTap: () => context.push('/producto/${product.id}'),
+      onTap: () => kIsWeb ? context.go('/producto/${product.id}') : context.push('/producto/${product.id}'),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: Container(
@@ -724,7 +724,7 @@ class _HorizontalProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/producto/${product.id}'),
+      onTap: () => kIsWeb ? context.go('/producto/${product.id}') : context.push('/producto/${product.id}'),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
         child: Container(
@@ -773,7 +773,7 @@ class _HorizontalProductCard extends StatelessWidget {
                       Row(children: [
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, foregroundColor: Colors.white, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8), elevation: 0),
-                          onPressed: () => context.push('/producto/${product.id}'),
+                          onPressed: () => kIsWeb ? context.go('/producto/${product.id}') : context.push('/producto/${product.id}'),
                           child: Text('Ver producto', style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 12)),
                         ),
                         const SizedBox(width: 16),
