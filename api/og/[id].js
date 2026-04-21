@@ -77,7 +77,7 @@ module.exports = async function handler(req, res) {
       ),
       fetch(
         `${SUPABASE_URL}/rest/v1/product_images` +
-          `?product_id=eq.${id}&is_cover=eq.true` +
+          `?product_id=eq.${id}` +
           `&select=image_url&order=sort_order.asc&limit=1`,
         { headers }
       ),
