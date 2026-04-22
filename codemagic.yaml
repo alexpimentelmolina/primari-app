@@ -55,10 +55,14 @@ workflows:
         script: xcode-project use-profiles
 
       # 5. Build IPA firmada
+      # $BUILD_NUMBER es una variable de entorno automática de Codemagic que
+      # incrementa en cada build del workflow. Esto evita el rechazo de Apple
+      # por "duplicate build number" cuando se hacen varios pushes a main.
       - name: Flutter build IPA
         script: |
           flutter build ipa \
             --release \
+            --build-number=$BUILD_NUMBER \
             --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:
