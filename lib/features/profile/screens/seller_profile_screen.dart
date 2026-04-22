@@ -46,11 +46,29 @@ class SellerProfileScreen extends ConsumerWidget {
           final phone = seller['phone'] as String?;
           final isBusiness = seller['account_type'] == 'business';
 
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: MediaQuery.of(context).padding.top + 96),
+          return LayoutBuilder(builder: (context, constraints) {
+            final w = constraints.maxWidth;
+            final isDesktopWeb = kIsWeb && w > 900;
+            final columns = isDesktopWeb ? (w >= 1400 ? 5 : w >= 1100 ? 4 : 3) : 2;
+            Widget wideButton(Widget child) => isDesktopWeb
+                ? Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 340),
+                      child: child,
+                    ),
+                  )
+                : SizedBox(width: double.infinity, child: child);
+            return SingleChildScrollView(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: isDesktopWeb ? 1100.0 : double.infinity,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).padding.top + 96),
                 // Header del vendedor
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -154,28 +172,25 @@ class SellerProfileScreen extends ConsumerWidget {
                       ],
                       if (phone != null && phone.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        _WhatsAppButton(phone: phone),
+                        wideButton(_WhatsAppButton(phone: phone)),
                       ],
                       const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () =>
-                              context.push('/vendedor/$sellerId/resenas'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppTheme.primary,
-                            side: const BorderSide(color: AppTheme.outline),
-                            shape: const StadiumBorder(),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          icon: const Icon(Icons.star_outline_rounded, size: 18),
-                          label: Text(
-                            'Ver valoraciones',
-                            style: GoogleFonts.manrope(
-                                fontWeight: FontWeight.w600, fontSize: 14),
-                          ),
+                      wideButton(OutlinedButton.icon(
+                        onPressed: () =>
+                            context.push('/vendedor/$sellerId/resenas'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.primary,
+                          side: const BorderSide(color: AppTheme.outline),
+                          shape: const StadiumBorder(),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                      ),
+                        icon: const Icon(Icons.star_outline_rounded, size: 18),
+                        label: Text(
+                          'Ver valoraciones',
+                          style: GoogleFonts.manrope(
+                              fontWeight: FontWeight.w600, fontSize: 14),
+                        ),
+                      )),
                     ],
                   ),
                 ),
@@ -227,11 +242,12 @@ class SellerProfileScreen extends ConsumerWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columns,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                         childAspectRatio: 0.75,
+                        mainAxisExtent: isDesktopWeb ? 200.0 : null,
                       ),
                       itemCount: products.length,
                       itemBuilder: (ctx, i) =>
@@ -242,7 +258,10 @@ class SellerProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 32),
               ],
             ),
-          );
+          ),
+        ),
+      );
+    });
         },
       ),
     );
