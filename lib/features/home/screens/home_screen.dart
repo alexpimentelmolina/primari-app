@@ -29,7 +29,6 @@ class HomeScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isWeb = constraints.maxWidth > 900;
-          final isWebMobile = kIsWeb && constraints.maxWidth < 600;
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                 if (isWeb) const _WebHeroSection(),
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isWeb ? 80 : (isWebMobile ? 16 : 24),
+                    horizontal: isWeb ? 80 : 16,
                   ),
                   child: Column(
                     crossAxisAlignment: isWeb ? CrossAxisAlignment.center : CrossAxisAlignment.start,
@@ -297,7 +296,9 @@ class _CategoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWebMobile = kIsWeb && MediaQuery.of(context).size.width < 600;
+    // Mismo layout para nativo y web móvil: sin kIsWeb para que ambos
+    // usen círculos grandes y el espaciado más abierto.
+    final isDesktopWeb = MediaQuery.of(context).size.width > 900;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,19 +313,16 @@ class _CategoriesSection extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         SizedBox(
-          height: isWebMobile ? 124 : 112,
+          height: isDesktopWeb ? 112 : 124,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            // Clip.none para que el ítem parcialmente visible en el borde
-            // no quede cortado de forma abrupta en web móvil
-            clipBehavior: isWebMobile ? Clip.none : Clip.hardEdge,
-            // Padding de fin para que el último ítem pueda scrollar hasta verse completo
-            padding: isWebMobile
-                ? const EdgeInsets.only(right: 16)
-                : EdgeInsets.zero,
+            clipBehavior: isDesktopWeb ? Clip.hardEdge : Clip.none,
+            padding: isDesktopWeb
+                ? EdgeInsets.zero
+                : const EdgeInsets.only(right: 16),
             itemCount: _categories.length,
             separatorBuilder: (context, index) => SizedBox(
-              width: isWebMobile ? 20 : 16,
+              width: isDesktopWeb ? 16 : 20,
             ),
             itemBuilder: (context, index) {
               final (icon, label, bg, fg, catKey) = _categories[index];
@@ -340,7 +338,7 @@ class _CategoriesSection extends StatelessWidget {
                 svgAsset: svgAsset,
                 applyColorFilter: applyColorFilter,
                 svgSize: svgSize,
-                circleSize: isWebMobile ? 88.0 : 80.0,
+                circleSize: isDesktopWeb ? 80.0 : 88.0,
               );
             },
           ),
