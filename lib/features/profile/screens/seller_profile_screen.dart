@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../products/models/product.dart';
 import '../../products/providers/products_provider.dart';
+import '../../reviews/providers/reviews_provider.dart';
 
 class SellerProfileScreen extends ConsumerWidget {
   final String sellerId;
@@ -17,6 +18,7 @@ class SellerProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileAsync = ref.watch(sellerProfileProvider(sellerId));
     final productsAsync = ref.watch(sellerProductsProvider(sellerId));
+    final ratingSummaryAsync = ref.watch(sellerRatingSummaryProvider(sellerId));
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -143,6 +145,31 @@ class SellerProfileScreen extends ConsumerWidget {
                                   style: GoogleFonts.manrope(fontSize: 15, color: AppTheme.onSurfaceVariant, height: 1.6),
                                 ),
                               ],
+                              const SizedBox(height: 24),
+                              // ── Métricas: productos activos + valoración ──
+                              Row(
+                                children: [
+                                  // Productos activos
+                                  _MetricCard(
+                                    label: 'PRODUCTOS ACTIVOS',
+                                    value: productsAsync.when(
+                                      data: (p) => '${p.length}',
+                                      loading: () => '—',
+                                      error: (e, _) => '—',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Media de valoraciones
+                                  _MetricCard(
+                                    label: 'VALORACIÓN MEDIA',
+                                    value: ratingSummaryAsync.when(
+                                      data: (s) => s.$2 == 0 ? 'Sin reseñas' : '${s.$1.toStringAsFixed(1)} ★',
+                                      loading: () => '—',
+                                      error: (e, _) => '—',
+                                    ),
+                                  ),
+                                ],
+                              ),
                               const SizedBox(height: 28),
                               // Botones en fila horizontal
                               Row(
@@ -363,6 +390,46 @@ class _SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _MetricCard extends StatelessWidget {
+  final String label;
+  final String value;
+  const _MetricCard({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: AppTheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.notoSerif(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.primary,
+            ),
+          ),
+        ],
       ),
     );
   }
