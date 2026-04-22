@@ -16,11 +16,11 @@ Future<void> shareWithImage({
         final ext = imageUrl.contains('.png') ? 'png' : 'jpg';
         final file = File('${tempDir.path}/primari_share.$ext');
         await file.writeAsBytes(response.bodyBytes);
-        await SharePlus.instance.share(ShareParams(
-          files: [XFile(file.path)],
+        await Share.shareXFiles(
+          [XFile(file.path)],
           text: text,
           subject: subject,
-        ));
+        );
         return;
       }
     } catch (_) {
@@ -28,8 +28,5 @@ Future<void> shareWithImage({
     }
   }
 
-  await SharePlus.instance.share(ShareParams(
-    text: text,
-    subject: subject,
-  ));
+  await Share.share(text, subject: subject);
 }
