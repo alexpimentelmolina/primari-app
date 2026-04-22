@@ -91,54 +91,87 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
-      body: LayoutBuilder(
-        builder: (ctx, constraints) {
-          final isWide = constraints.maxWidth > 768;
-          if (isWide) {
-            return Row(
-              children: [
-                const Expanded(child: _LeftPanel()),
-                Expanded(
-                  child: _FormPanel(
-                    emailController: _emailController,
-                    passwordController: _passwordController,
-                    obscurePassword: _obscurePassword,
-                    isIndividual: _isIndividual,
-                    acceptedTerms: _acceptedTerms,
-                    isLoading: _isLoading,
-                    emailSent: _emailSent,
-                    error: _error,
-                    onTogglePassword: () => setState(
-                        () => _obscurePassword = !_obscurePassword),
-                    onToggleAccountType: (v) =>
-                        setState(() => _isIndividual = v),
-                    onTermsChanged: (val) =>
-                        setState(() => _acceptedTerms = val ?? false),
-                    onRegister: _handleRegister,
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return _FormPanel(
-              emailController: _emailController,
-              passwordController: _passwordController,
-              obscurePassword: _obscurePassword,
-              isIndividual: _isIndividual,
-              acceptedTerms: _acceptedTerms,
-              isLoading: _isLoading,
-              emailSent: _emailSent,
-              error: _error,
-              onTogglePassword: () =>
-                  setState(() => _obscurePassword = !_obscurePassword),
-              onToggleAccountType: (v) =>
-                  setState(() => _isIndividual = v),
-              onTermsChanged: (val) =>
-                  setState(() => _acceptedTerms = val ?? false),
-              onRegister: _handleRegister,
-            );
-          }
-        },
+      body: Stack(
+        children: [
+          LayoutBuilder(
+            builder: (ctx, constraints) {
+              final isWide = constraints.maxWidth > 768;
+              if (isWide) {
+                return Row(
+                  children: [
+                    const Expanded(child: _LeftPanel()),
+                    Expanded(
+                      child: _FormPanel(
+                        emailController: _emailController,
+                        passwordController: _passwordController,
+                        obscurePassword: _obscurePassword,
+                        isIndividual: _isIndividual,
+                        acceptedTerms: _acceptedTerms,
+                        isLoading: _isLoading,
+                        emailSent: _emailSent,
+                        error: _error,
+                        onTogglePassword: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
+                        onToggleAccountType: (v) =>
+                            setState(() => _isIndividual = v),
+                        onTermsChanged: (val) =>
+                            setState(() => _acceptedTerms = val ?? false),
+                        onRegister: _handleRegister,
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return _FormPanel(
+                  emailController: _emailController,
+                  passwordController: _passwordController,
+                  obscurePassword: _obscurePassword,
+                  isIndividual: _isIndividual,
+                  acceptedTerms: _acceptedTerms,
+                  isLoading: _isLoading,
+                  emailSent: _emailSent,
+                  error: _error,
+                  onTogglePassword: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
+                  onToggleAccountType: (v) =>
+                      setState(() => _isIndividual = v),
+                  onTermsChanged: (val) =>
+                      setState(() => _acceptedTerms = val ?? false),
+                  onRegister: _handleRegister,
+                );
+              }
+            },
+          ),
+          const SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: _AuthBackButton(fallback: '/login'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthBackButton extends StatelessWidget {
+  final String fallback;
+  const _AuthBackButton({required this.fallback});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainerLow,
+        shape: BoxShape.circle,
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: IconButton(
+        onPressed: () =>
+            context.canPop() ? context.pop() : context.go(fallback),
+        icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+        color: AppTheme.primary,
+        tooltip: 'Volver',
       ),
     );
   }

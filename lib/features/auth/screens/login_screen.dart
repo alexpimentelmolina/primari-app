@@ -134,46 +134,79 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: LayoutBuilder(
-        builder: (ctx, constraints) {
-          final isWide = constraints.maxWidth > 768;
-          if (isWide) {
-            return Row(
-              children: [
-                Expanded(child: _LeftPanel(bgImageUrl: _bgImageUrl)),
-                Expanded(
-                  child: _FormPanel(
-                    emailController: _emailController,
-                    passwordController: _passwordController,
-                    obscurePassword: _obscurePassword,
-                    onTogglePassword: () => setState(
-                        () => _obscurePassword = !_obscurePassword),
-                    fieldDecoration: _fieldDecoration,
-                    isLoading: _isLoading,
-                    error: _error,
-                    onLogin: _handleLogin,
-                    onGoogleSignIn: _handleGoogleSignIn,
-                    onAppleSignIn: _handleAppleSignIn,
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return _FormPanel(
-              emailController: _emailController,
-              passwordController: _passwordController,
-              obscurePassword: _obscurePassword,
-              onTogglePassword: () =>
-                  setState(() => _obscurePassword = !_obscurePassword),
-              fieldDecoration: _fieldDecoration,
-              isLoading: _isLoading,
-              error: _error,
-              onLogin: _handleLogin,
-              onGoogleSignIn: _handleGoogleSignIn,
-              onAppleSignIn: _handleAppleSignIn,
-            );
-          }
-        },
+      body: Stack(
+        children: [
+          LayoutBuilder(
+            builder: (ctx, constraints) {
+              final isWide = constraints.maxWidth > 768;
+              if (isWide) {
+                return Row(
+                  children: [
+                    Expanded(child: _LeftPanel(bgImageUrl: _bgImageUrl)),
+                    Expanded(
+                      child: _FormPanel(
+                        emailController: _emailController,
+                        passwordController: _passwordController,
+                        obscurePassword: _obscurePassword,
+                        onTogglePassword: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
+                        fieldDecoration: _fieldDecoration,
+                        isLoading: _isLoading,
+                        error: _error,
+                        onLogin: _handleLogin,
+                        onGoogleSignIn: _handleGoogleSignIn,
+                        onAppleSignIn: _handleAppleSignIn,
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                return _FormPanel(
+                  emailController: _emailController,
+                  passwordController: _passwordController,
+                  obscurePassword: _obscurePassword,
+                  onTogglePassword: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
+                  fieldDecoration: _fieldDecoration,
+                  isLoading: _isLoading,
+                  error: _error,
+                  onLogin: _handleLogin,
+                  onGoogleSignIn: _handleGoogleSignIn,
+                  onAppleSignIn: _handleAppleSignIn,
+                );
+              }
+            },
+          ),
+          const SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(8),
+              child: _AuthBackButton(fallback: '/home'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthBackButton extends StatelessWidget {
+  final String fallback;
+  const _AuthBackButton({required this.fallback});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainerLow,
+        shape: BoxShape.circle,
+        border: Border.all(color: AppTheme.outlineVariant),
+      ),
+      child: IconButton(
+        onPressed: () =>
+            context.canPop() ? context.pop() : context.go(fallback),
+        icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+        color: AppTheme.primary,
+        tooltip: 'Volver',
       ),
     );
   }
