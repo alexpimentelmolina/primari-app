@@ -61,11 +61,10 @@ class SellerProfileScreen extends ConsumerWidget {
                   )
                 : SizedBox(width: double.infinity, child: child);
             return SingleChildScrollView(
-              child: Align(
-                alignment: Alignment.topCenter,
+              child: Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: isDesktopWeb ? 1100.0 : double.infinity,
+                    maxWidth: isDesktopWeb ? 1200.0 : double.infinity,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,8 +79,7 @@ class SellerProfileScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Avatar rectangular grande
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
+                        ClipOval(
                           child: SizedBox(
                             width: 260,
                             height: 260,
@@ -332,7 +330,7 @@ class SellerProfileScreen extends ConsumerWidget {
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                         childAspectRatio: 0.75,
-                        mainAxisExtent: isDesktopWeb ? 200.0 : null,
+                        mainAxisExtent: isDesktopWeb ? 260.0 : null,
                       ),
                       itemCount: products.length,
                       itemBuilder: (ctx, i) =>
