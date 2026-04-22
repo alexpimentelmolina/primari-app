@@ -221,7 +221,7 @@ class _ImageGallery extends StatelessWidget {
                   ),
                 ),
           Positioned(
-            top: MediaQuery.of(context).padding.top + 96,
+            bottom: 12,
             left: 16,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
