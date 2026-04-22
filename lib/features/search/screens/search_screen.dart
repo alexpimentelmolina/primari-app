@@ -99,11 +99,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _locationError = null;
     });
     try {
-      // En web, getCurrentPosition dispara el prompt de permisos directamente.
+      // En apps nativas hay que solicitar el permiso explícitamente antes de
+      // llamar a getCurrentPosition (en web el navegador lo gestiona solo).
+      if (!kIsWeb) {
+        var permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever) {
+          if (!mounted) return;
+          setState(() {
+            _locationError = permission == LocationPermission.deniedForever
+                ? 'Permiso denegado permanentemente. Actívalo en Ajustes > Privacidad > Ubicación.'
+                : 'Permiso de ubicación denegado.';
+            _isGettingLocation = false;
+          });
+          return;
+        }
+      }
+
       final pos = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.low,
-          timeLimit: Duration(seconds: 8), // 20 → 8: falla rápido si el GPS no responde
+          timeLimit: Duration(seconds: 8),
         ),
       );
       if (!mounted) return;
@@ -125,8 +144,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     } on PermissionDeniedException {
       if (!mounted) return;
       setState(() {
-        _locationError =
-            'Permiso denegado. Actívalo en la configuración del navegador.';
+        _locationError = kIsWeb
+            ? 'Permiso denegado. Actívalo en la configuración del navegador.'
+            : 'Permiso denegado. Actívalo en Ajustes > Privacidad > Ubicación.';
         _isGettingLocation = false;
       });
     } catch (_) {
