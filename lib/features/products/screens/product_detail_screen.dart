@@ -82,7 +82,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       category: product.categoryLabel,
                     ),
                     Positioned(
-                      top: 96,
+                      top: MediaQuery.of(context).padding.top + 96,
                       right: 16,
                       child: _ReportButton(
                         productId: product.id,
@@ -221,7 +221,7 @@ class _ImageGallery extends StatelessWidget {
                   ),
                 ),
           Positioned(
-            top: 96,
+            top: MediaQuery.of(context).padding.top + 96,
             left: 16,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

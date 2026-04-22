@@ -208,7 +208,7 @@ class _FavoritesList extends StatelessWidget {
         final columns = w >= 1100 ? 5 : w >= 800 ? 4 : w >= 550 ? 3 : 2;
         return GridView.builder(
           padding: EdgeInsets.only(
-            top: 96,
+            top: MediaQuery.of(context).padding.top + 96,
             left: 16,
             right: 16,
             bottom: MediaQuery.of(context).padding.bottom + 16,

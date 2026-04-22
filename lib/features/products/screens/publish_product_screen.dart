@@ -181,7 +181,7 @@ class _PublishProductScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 88),
+            SizedBox(height: MediaQuery.of(context).padding.top + 88),
             _SectionHeader(
               title: 'Muestra tu producto',
               subtitle: '${_images.length}/8 imágenes · toca para añadir',

@@ -231,7 +231,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 88),
+                SizedBox(height: MediaQuery.of(context).padding.top + 88),
                 // ── Datos personales ──────────────────────────────────
                 const _SectionHeader(
                   title: 'Datos personales',

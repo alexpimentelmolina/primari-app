@@ -52,7 +52,7 @@ class MyProfileScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 96),
+                SizedBox(height: MediaQuery.of(context).padding.top + 96),
                 _ProfileHeader(
                   displayName: displayName,
                   city: city,

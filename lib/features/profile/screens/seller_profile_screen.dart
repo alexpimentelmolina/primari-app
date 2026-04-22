@@ -50,7 +50,7 @@ class SellerProfileScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 96),
+                SizedBox(height: MediaQuery.of(context).padding.top + 96),
                 // Header del vendedor
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),

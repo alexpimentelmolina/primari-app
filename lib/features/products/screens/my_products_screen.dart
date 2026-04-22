@@ -77,7 +77,7 @@ class MyProductsScreen extends ConsumerWidget {
 
           return ListView.separated(
             padding: EdgeInsets.only(
-              top: 96,
+              top: MediaQuery.of(context).padding.top + 96,
               left: 16,
               right: 16,
               bottom: MediaQuery.of(context).padding.bottom + 16,

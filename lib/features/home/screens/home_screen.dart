@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 80), // espacio para el appbar transparente
+                SizedBox(height: MediaQuery.of(context).padding.top + 80), // appbar + gap
                 if (isWeb) const _WebHeroSection(),
                 Padding(
                   padding: EdgeInsets.symmetric(
