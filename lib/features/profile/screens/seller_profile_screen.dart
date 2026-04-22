@@ -70,130 +70,188 @@ class SellerProfileScreen extends ConsumerWidget {
                     children: [
                       SizedBox(height: MediaQuery.of(context).padding.top + 96),
                 // Header del vendedor
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    children: [
-                      // Avatar
-                      Center(
-                        child: CircleAvatar(
-                          radius: 56,
-                          backgroundImage: avatarUrl != null
-                              ? NetworkImage(avatarUrl)
-                              : null,
-                          backgroundColor: AppTheme.surfaceContainerHigh,
-                          child: avatarUrl == null
-                              ? Text(
-                                  name.isNotEmpty
-                                      ? name[0].toUpperCase()
-                                      : '?',
-                                  style: GoogleFonts.notoSerif(
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppTheme.primary,
+                if (isDesktopWeb)
+                  // ── DESKTOP: foto izquierda + datos derecha ──────────────
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Avatar rectangular grande
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: SizedBox(
+                            width: 260,
+                            height: 260,
+                            child: avatarUrl != null
+                                ? Image.network(
+                                    avatarUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (ctx, err, st) => _AvatarFallback(name: name),
+                                  )
+                                : _AvatarFallback(name: name),
+                          ),
+                        ),
+                        const SizedBox(width: 48),
+                        // Info derecha
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Badge + ciudad en la misma fila
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.tertiaryFixed,
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(isBusiness ? Icons.business : Icons.eco, size: 13, color: AppTheme.tertiary),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          isBusiness ? 'EMPRESA VERIFICADA' : 'PRODUCTOR VERIFICADO',
+                                          style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.tertiary),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                )
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        name,
-                        style: GoogleFonts.notoSerif(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.onSurface,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (city.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.location_on,
-                                size: 14,
-                                color: AppTheme.onSurfaceVariant),
-                            const SizedBox(width: 4),
-                            Text(
-                              city.toUpperCase(),
-                              style: GoogleFonts.manrope(
-                                fontSize: 12,
-                                letterSpacing: 1.2,
-                                color: AppTheme.onSurfaceVariant,
+                                  if (city.isNotEmpty) ...[
+                                    const SizedBox(width: 16),
+                                    Icon(Icons.location_on, size: 14, color: AppTheme.onSurfaceVariant),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      city.toUpperCase(),
+                                      style: GoogleFonts.manrope(fontSize: 12, letterSpacing: 1.2, color: AppTheme.onSurfaceVariant),
+                                    ),
+                                  ],
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppTheme.tertiaryFixed,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isBusiness
-                                  ? Icons.business
-                                  : Icons.eco,
-                              size: 13,
-                              color: AppTheme.tertiary,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              isBusiness
-                                  ? 'EMPRESA VERIFICADA'
-                                  : 'PRODUCTOR VERIFICADO',
-                              style: GoogleFonts.manrope(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.tertiary,
+                              const SizedBox(height: 16),
+                              // Nombre grande
+                              Text(
+                                name,
+                                style: GoogleFonts.notoSerif(fontSize: 40, fontWeight: FontWeight.bold, color: AppTheme.onSurface),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (bio != null && bio.isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        Text(
-                          bio,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.manrope(
-                            fontSize: 14,
-                            color: AppTheme.onSurfaceVariant,
-                            height: 1.6,
+                              if (bio != null && bio.isNotEmpty) ...[
+                                const SizedBox(height: 16),
+                                Text(
+                                  bio,
+                                  style: GoogleFonts.manrope(fontSize: 15, color: AppTheme.onSurfaceVariant, height: 1.6),
+                                ),
+                              ],
+                              const SizedBox(height: 28),
+                              // Botones en fila horizontal
+                              Row(
+                                children: [
+                                  if (phone != null && phone.isNotEmpty) ...[
+                                    ConstrainedBox(
+                                      constraints: const BoxConstraints(maxWidth: 240),
+                                      child: _WhatsAppButton(phone: phone),
+                                    ),
+                                    const SizedBox(width: 12),
+                                  ],
+                                  OutlinedButton.icon(
+                                    onPressed: () => context.push('/vendedor/$sellerId/resenas'),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: AppTheme.primary,
+                                      side: const BorderSide(color: AppTheme.outline),
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                                    ),
+                                    icon: const Icon(Icons.star_outline_rounded, size: 18),
+                                    label: Text('Ver valoraciones', style: GoogleFonts.manrope(fontWeight: FontWeight.w600, fontSize: 14)),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                      if (phone != null && phone.isNotEmpty) ...[
-                        const SizedBox(height: 20),
-                        wideButton(_WhatsAppButton(phone: phone)),
+                    ),
+                  )
+                else
+                  // ── MÓVIL: layout original sin tocar ─────────────────────
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        // Avatar
+                        Center(
+                          child: CircleAvatar(
+                            radius: 56,
+                            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                            backgroundColor: AppTheme.surfaceContainerHigh,
+                            child: avatarUrl == null
+                                ? Text(
+                                    name.isNotEmpty ? name[0].toUpperCase() : '?',
+                                    style: GoogleFonts.notoSerif(fontSize: 36, fontWeight: FontWeight.bold, color: AppTheme.primary),
+                                  )
+                                : null,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          name,
+                          style: GoogleFonts.notoSerif(fontSize: 26, fontWeight: FontWeight.bold, color: AppTheme.onSurface),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (city.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.location_on, size: 14, color: AppTheme.onSurfaceVariant),
+                              const SizedBox(width: 4),
+                              Text(
+                                city.toUpperCase(),
+                                style: GoogleFonts.manrope(fontSize: 12, letterSpacing: 1.2, color: AppTheme.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(color: AppTheme.tertiaryFixed, borderRadius: BorderRadius.circular(999)),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(isBusiness ? Icons.business : Icons.eco, size: 13, color: AppTheme.tertiary),
+                              const SizedBox(width: 6),
+                              Text(
+                                isBusiness ? 'EMPRESA VERIFICADA' : 'PRODUCTOR VERIFICADO',
+                                style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.tertiary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (bio != null && bio.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          Text(bio, textAlign: TextAlign.center, style: GoogleFonts.manrope(fontSize: 14, color: AppTheme.onSurfaceVariant, height: 1.6)),
+                        ],
+                        if (phone != null && phone.isNotEmpty) ...[
+                          const SizedBox(height: 20),
+                          wideButton(_WhatsAppButton(phone: phone)),
+                        ],
+                        const SizedBox(height: 12),
+                        wideButton(OutlinedButton.icon(
+                          onPressed: () => context.push('/vendedor/$sellerId/resenas'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.primary,
+                            side: const BorderSide(color: AppTheme.outline),
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          icon: const Icon(Icons.star_outline_rounded, size: 18),
+                          label: Text('Ver valoraciones', style: GoogleFonts.manrope(fontWeight: FontWeight.w600, fontSize: 14)),
+                        )),
                       ],
-                      const SizedBox(height: 12),
-                      wideButton(OutlinedButton.icon(
-                        onPressed: () =>
-                            context.push('/vendedor/$sellerId/resenas'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.primary,
-                          side: const BorderSide(color: AppTheme.outline),
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        icon: const Icon(Icons.star_outline_rounded, size: 18),
-                        label: Text(
-                          'Ver valoraciones',
-                          style: GoogleFonts.manrope(
-                              fontWeight: FontWeight.w600, fontSize: 14),
-                        ),
-                      )),
-                    ],
+                    ),
                   ),
-                ),
                 const SizedBox(height: 40),
 
                 // Productos del vendedor
@@ -304,6 +362,24 @@ class _SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  final String name;
+  const _AvatarFallback({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppTheme.surfaceContainerHigh,
+      child: Center(
+        child: Text(
+          name.isNotEmpty ? name[0].toUpperCase() : '?',
+          style: GoogleFonts.notoSerif(fontSize: 80, fontWeight: FontWeight.bold, color: AppTheme.primary),
         ),
       ),
     );
