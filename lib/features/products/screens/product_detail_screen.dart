@@ -307,7 +307,7 @@ class _SellerBlock extends StatelessWidget {
     final avatarUrl = seller['avatar_url'] as String?;
 
     return GestureDetector(
-      onTap: () => context.push('/vendedor/$sellerId'),
+      onTap: () => kIsWeb ? context.go('/vendedor/$sellerId') : context.push('/vendedor/$sellerId'),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(color: AppTheme.surfaceContainerLow, borderRadius: BorderRadius.circular(16)),

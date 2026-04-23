@@ -186,7 +186,7 @@ class SellerProfileScreen extends ConsumerWidget {
                                     const SizedBox(width: 12),
                                   ],
                                   OutlinedButton.icon(
-                                    onPressed: () => context.push('/vendedor/$sellerId/resenas'),
+                                    onPressed: () => kIsWeb ? context.go('/vendedor/$sellerId/resenas') : context.push('/vendedor/$sellerId/resenas'),
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor: AppTheme.primary,
                                       side: const BorderSide(color: AppTheme.outline),
@@ -270,7 +270,7 @@ class SellerProfileScreen extends ConsumerWidget {
                         ],
                         const SizedBox(height: 12),
                         wideButton(OutlinedButton.icon(
-                          onPressed: () => context.push('/vendedor/$sellerId/resenas'),
+                          onPressed: () => kIsWeb ? context.go('/vendedor/$sellerId/resenas') : context.push('/vendedor/$sellerId/resenas'),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppTheme.primary,
                             side: const BorderSide(color: AppTheme.outline),
