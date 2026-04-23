@@ -286,7 +286,7 @@ class _ProfileHeaderState extends ConsumerState<_ProfileHeader> {
               ),
               const SizedBox(width: 8),
               Text(
-                isBusiness ? 'EMPRESA VERIFICADA' : 'PRODUCTOR VERIFICADO',
+                isBusiness ? 'EMPRESA' : 'PRODUCTOR PARTICULAR',
                 style: GoogleFonts.manrope(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,

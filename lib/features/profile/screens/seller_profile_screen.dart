@@ -119,7 +119,7 @@ class SellerProfileScreen extends ConsumerWidget {
                                         Icon(isBusiness ? Icons.business : Icons.eco, size: 13, color: AppTheme.tertiary),
                                         const SizedBox(width: 6),
                                         Text(
-                                          isBusiness ? 'EMPRESA VERIFICADA' : 'PRODUCTOR VERIFICADO',
+                                          isBusiness ? 'EMPRESA' : 'PRODUCTOR PARTICULAR',
                                           style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.tertiary),
                                         ),
                                       ],
@@ -254,7 +254,7 @@ class SellerProfileScreen extends ConsumerWidget {
                               Icon(isBusiness ? Icons.business : Icons.eco, size: 13, color: AppTheme.tertiary),
                               const SizedBox(width: 6),
                               Text(
-                                isBusiness ? 'EMPRESA VERIFICADA' : 'PRODUCTOR VERIFICADO',
+                                isBusiness ? 'EMPRESA' : 'PRODUCTOR PARTICULAR',
                                 style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.tertiary),
                               ),
                             ],

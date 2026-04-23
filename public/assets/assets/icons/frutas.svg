@@ -1,0 +1,8 @@
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- stem -->
+  <path d="M12 4.5C12 3.2 13.8 2 15.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <!-- leaf -->
+  <path d="M12 4.5C12.5 3.5 14.5 3.2 15.5 4.2C14.5 4.8 12.5 4.8 12 4.5Z" fill="currentColor"/>
+  <!-- apple body -->
+  <path d="M8.5 7C6 7 4 9.5 4 13C4 17.5 7 22 10 22C11 22 11.5 21.5 12 21.5C12.5 21.5 13 22 14 22C17 22 20 17.5 20 13C20 9.5 18 7 15.5 7C14 7 13 8 12 8C11 8 10 7 8.5 7Z" fill="currentColor"/>
+</svg>
