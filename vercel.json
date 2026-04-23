@@ -6,7 +6,8 @@
   "buildCommand": "",
   "outputDirectory": "public",
   "rewrites": [
-    { "source": "/producto/:id",       "destination": "/api/og/:id" },
+    { "source": "/producto/:id",        "destination": "/api/og/:id" },
+    { "source": "/vendedor/:id",        "destination": "/api/og/vendedor/:id" },
     { "source": "/.well-known/:file+", "destination": "/.well-known/:file+" },
     { "source": "/(.*)",               "destination": "/index.html" }
   ],

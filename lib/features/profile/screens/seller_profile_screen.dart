@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/utils/share_with_image.dart';
 import '../../products/models/product.dart';
 import '../../products/providers/products_provider.dart';
 import '../../reviews/providers/reviews_provider.dart';
@@ -23,7 +25,11 @@ class SellerProfileScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppTheme.background,
       extendBodyBehindAppBar: true,
-      appBar: _SellerAppBar(),
+      appBar: _SellerAppBar(
+        sellerId: sellerId,
+        sellerName: profileAsync.valueOrNull?['display_name'] as String?,
+        avatarUrl: profileAsync.valueOrNull?['avatar_url'] as String?,
+      ),
       body: profileAsync.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppTheme.primary),
@@ -352,8 +358,32 @@ class SellerProfileScreen extends ConsumerWidget {
 }
 
 class _SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String sellerId;
+  final String? sellerName;
+  final String? avatarUrl;
+
+  const _SellerAppBar({
+    required this.sellerId,
+    this.sellerName,
+    this.avatarUrl,
+  });
+
   @override
   Size get preferredSize => const Size.fromHeight(72);
+
+  Future<void> _share() async {
+    const base = 'https://www.weareprimari.com/vendedor';
+    final url  = '$base/$sellerId';
+    final name = sellerName ?? 'Productor en Prímari';
+    final text = '$name\n$url';
+
+    if (kIsWeb) {
+      await Share.share(text, subject: name);
+      return;
+    }
+
+    await shareWithImage(text: text, subject: name, imageUrl: avatarUrl);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -374,13 +404,22 @@ class _SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
                       color: AppTheme.primary,
                       onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
                     ),
-                    Text(
-                      'Perfil del vendedor',
-                      style: GoogleFonts.notoSerif(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primary,
+                    Expanded(
+                      child: Text(
+                        sellerName ?? 'Perfil del vendedor',
+                        style: GoogleFonts.notoSerif(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.share_outlined),
+                      color: AppTheme.primary,
+                      onPressed: _share,
                     ),
                   ],
                 ),
