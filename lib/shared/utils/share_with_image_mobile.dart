@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' show Rect;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -7,6 +8,7 @@ Future<void> shareWithImage({
   required String text,
   required String subject,
   String? imageUrl,
+  Rect? sharePositionOrigin,
 }) async {
   if (imageUrl != null) {
     try {
@@ -20,6 +22,7 @@ Future<void> shareWithImage({
           [XFile(file.path)],
           text: text,
           subject: subject,
+          sharePositionOrigin: sharePositionOrigin,
         );
         return;
       }
@@ -28,5 +31,5 @@ Future<void> shareWithImage({
     }
   }
 
-  await Share.share(text, subject: subject);
+  await Share.share(text, subject: subject, sharePositionOrigin: sharePositionOrigin);
 }

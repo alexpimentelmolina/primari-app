@@ -142,14 +142,19 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(72);
 
-  Future<void> _shareProduct() async {
+  Future<void> _shareProduct(BuildContext context) async {
     const base = 'https://www.weareprimari.com/producto';
     final url = '$base/$productId';
     final text = '$title\n$url';
 
+    final box = context.findRenderObject() as RenderBox?;
+    final origin = box == null
+        ? Rect.zero
+        : box.localToGlobal(Offset.zero) & box.size;
+
     // En web: solo texto + URL
     if (kIsWeb) {
-      Share.share(text, subject: title);
+      await Share.share(text, subject: title, sharePositionOrigin: origin);
       return;
     }
 
@@ -158,6 +163,7 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
       text: text,
       subject: title,
       imageUrl: coverImageUrl,
+      sharePositionOrigin: origin,
     );
   }
 
@@ -177,10 +183,12 @@ class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     IconButton(icon: const Icon(Icons.arrow_back_ios_new), color: AppTheme.primary, onPressed: () => context.canPop() ? context.pop() : context.go('/home')),
                     Expanded(child: Text(title, style: GoogleFonts.notoSerif(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.onSurface), maxLines: 1, overflow: TextOverflow.ellipsis)),
-                    IconButton(
-                      icon: const Icon(Icons.share_outlined),
-                      color: AppTheme.primary,
-                      onPressed: _shareProduct,
+                    Builder(
+                      builder: (btnCtx) => IconButton(
+                        icon: const Icon(Icons.share_outlined),
+                        color: AppTheme.primary,
+                        onPressed: () => _shareProduct(btnCtx),
+                      ),
                     ),
                   ],
                 ),

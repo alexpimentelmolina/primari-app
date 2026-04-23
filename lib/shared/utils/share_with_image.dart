@@ -1,3 +1,4 @@
+import 'dart:ui' show Rect;
 import 'share_with_image_mobile.dart'
     if (dart.library.html) 'share_with_image_web.dart' as platform;
 
@@ -7,5 +8,11 @@ Future<void> shareWithImage({
   required String text,
   required String subject,
   String? imageUrl,
+  Rect? sharePositionOrigin,
 }) =>
-    platform.shareWithImage(text: text, subject: subject, imageUrl: imageUrl);
+    platform.shareWithImage(
+      text: text,
+      subject: subject,
+      imageUrl: imageUrl,
+      sharePositionOrigin: sharePositionOrigin,
+    );

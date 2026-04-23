@@ -371,18 +371,28 @@ class _SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(72);
 
-  Future<void> _share() async {
+  Future<void> _share(BuildContext context) async {
     const base = 'https://www.weareprimari.com/vendedor';
     final url  = '$base/$sellerId';
     final name = sellerName ?? 'Productor en Prímari';
     final text = '$name\n$url';
 
+    final box = context.findRenderObject() as RenderBox?;
+    final origin = box == null
+        ? Rect.zero
+        : box.localToGlobal(Offset.zero) & box.size;
+
     if (kIsWeb) {
-      await Share.share(text, subject: name);
+      await Share.share(text, subject: name, sharePositionOrigin: origin);
       return;
     }
 
-    await shareWithImage(text: text, subject: name, imageUrl: avatarUrl);
+    await shareWithImage(
+      text: text,
+      subject: name,
+      imageUrl: avatarUrl,
+      sharePositionOrigin: origin,
+    );
   }
 
   @override
@@ -416,10 +426,12 @@ class _SellerAppBar extends StatelessWidget implements PreferredSizeWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.share_outlined),
-                      color: AppTheme.primary,
-                      onPressed: _share,
+                    Builder(
+                      builder: (btnCtx) => IconButton(
+                        icon: const Icon(Icons.share_outlined),
+                        color: AppTheme.primary,
+                        onPressed: () => _share(btnCtx),
+                      ),
                     ),
                   ],
                 ),
