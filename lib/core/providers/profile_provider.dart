@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/profile/models/profile.dart';
 import '../../features/profile/services/profile_service.dart';
 import 'auth_provider.dart';
@@ -15,6 +16,28 @@ class ProfileNotifier extends AsyncNotifier<Profile?> {
     final authState = await ref.watch(authStateProvider.future);
     final user = authState.session?.user;
     if (user == null) return null;
+
+    // Subscribe to realtime changes on this user's profile row so that
+    // an admin suspension (is_active = false) takes effect immediately
+    // without waiting for the JWT to expire or the user to navigate.
+    final channel = Supabase.instance.client
+        .channel('profile:${user.id}')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'profiles',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'id',
+            value: user.id,
+          ),
+          callback: (_) => ref.invalidateSelf(),
+        )
+        .subscribe();
+
+    // Cancel the subscription when this provider is disposed (e.g. on sign-out)
+    ref.onDispose(() => channel.unsubscribe());
+
     return ref.read(profileServiceProvider).getProfile(user.id);
   }
 

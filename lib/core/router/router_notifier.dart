@@ -12,7 +12,13 @@ class RouterNotifier extends ChangeNotifier {
   final Ref _ref;
 
   RouterNotifier(this._ref) {
-    _ref.listen(authStateProvider, (prev, next) => notifyListeners());
+    _ref.listen(authStateProvider, (prev, next) {
+      // Force a fresh profile fetch whenever auth state changes so that
+      // a suspension applied while the user is logged in is detected promptly
+      // instead of relying on the cached profileProvider value.
+      _ref.invalidate(profileProvider);
+      notifyListeners();
+    });
     _ref.listen(profileProvider, (prev, next) => notifyListeners());
   }
 
