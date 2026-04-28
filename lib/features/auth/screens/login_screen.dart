@@ -8,7 +8,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  final String? errorParam;
+  const LoginScreen({super.key, this.errorParam});
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -18,6 +19,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
   String? _error;
+  bool _isSuspended = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.errorParam == 'suspended') {
+      _isSuspended = true;
+      _error = 'Tu cuenta ha sido suspendida. Revisa tu correo electrónico o contacta con soporte en hola@weareprimari.com';
+    }
+  }
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -44,6 +55,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
     if (msg.contains('Unsupported provider') || msg.contains('provider is not enabled')) {
       return 'Este método de acceso todavía no está disponible.';
+    }
+    if (msg.contains('banned') || msg.contains('suspended')) {
+      _isSuspended = true;
+      return 'Tu cuenta ha sido suspendida. Revisa tu correo electrónico o contacta con soporte en hola@weareprimari.com';
     }
     return msg;
   }
@@ -153,6 +168,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         fieldDecoration: _fieldDecoration,
                         isLoading: _isLoading,
                         error: _error,
+                        isSuspended: _isSuspended,
                         onLogin: _handleLogin,
                         onGoogleSignIn: _handleGoogleSignIn,
                         onAppleSignIn: _handleAppleSignIn,
@@ -170,6 +186,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   fieldDecoration: _fieldDecoration,
                   isLoading: _isLoading,
                   error: _error,
+                  isSuspended: _isSuspended,
                   onLogin: _handleLogin,
                   onGoogleSignIn: _handleGoogleSignIn,
                   onAppleSignIn: _handleAppleSignIn,
@@ -297,6 +314,7 @@ class _FormPanel extends StatelessWidget {
   final InputDecoration Function(String hint) fieldDecoration;
   final bool isLoading;
   final String? error;
+  final bool isSuspended;
   final VoidCallback onLogin;
   final VoidCallback onGoogleSignIn;
   final VoidCallback onAppleSignIn;
@@ -309,6 +327,7 @@ class _FormPanel extends StatelessWidget {
     required this.fieldDecoration,
     required this.isLoading,
     required this.error,
+    required this.isSuspended,
     required this.onLogin,
     required this.onGoogleSignIn,
     required this.onAppleSignIn,
@@ -413,22 +432,33 @@ class _FormPanel extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: AppTheme.error.withAlpha(20),
+                      color: isSuspended
+                          ? const Color(0xFFFFF3CD)
+                          : AppTheme.error.withAlpha(20),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: AppTheme.error.withAlpha(80)),
+                          color: isSuspended
+                              ? const Color(0xFFFFB300)
+                              : AppTheme.error.withAlpha(80)),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.error_outline,
-                            color: AppTheme.error, size: 16),
+                        Icon(
+                          isSuspended ? Icons.block : Icons.error_outline,
+                          color: isSuspended
+                              ? const Color(0xFFE65100)
+                              : AppTheme.error,
+                          size: 16,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             error!,
                             style: GoogleFonts.manrope(
                               fontSize: 13,
-                              color: AppTheme.error,
+                              color: isSuspended
+                                  ? const Color(0xFFE65100)
+                                  : AppTheme.error,
                             ),
                           ),
                         ),

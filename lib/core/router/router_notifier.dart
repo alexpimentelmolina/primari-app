@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
 
@@ -48,6 +49,12 @@ class RouterNotifier extends ChangeNotifier {
       // Forzar completar perfil (except si ya está ahí)
       if (loc == '/completar-perfil') return null;
       return '/completar-perfil';
+    }
+
+    // Cuenta suspendida: cerrar sesión y redirigir a login con mensaje
+    if (!profile.isActive) {
+      Future.microtask(() => Supabase.instance.client.auth.signOut());
+      return '/login?error=suspended';
     }
 
     // Tiene perfil: redirigir fuera de pantallas de auth

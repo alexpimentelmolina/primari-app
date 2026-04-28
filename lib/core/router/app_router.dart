@@ -39,7 +39,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => LoginScreen(
+          errorParam: state.uri.queryParameters['error'],
+        ),
       ),
       GoRoute(
         path: '/registro',
